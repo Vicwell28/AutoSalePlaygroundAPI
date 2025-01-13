@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="CQRS\Vehicle\Commands\" />
+    <Folder Include="CQRS\Vehicle\Queries\" />
+    <Folder Include="Behaviors\" />
+    <Folder Include="Mappings\" />
+    <Folder Include="Interfaces\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AutoSalePlaygroundAPI.Infrastructure\AutoSalePlaygroundAPI.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
