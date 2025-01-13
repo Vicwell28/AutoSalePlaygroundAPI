@@ -1,4 +1,6 @@
 using AutoSalePlaygroundAPI.API.Middlewares;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries;
+using FluentValidation;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +20,24 @@ builder.Services.AddSwaggerGen(c =>
 
     c.EnableAnnotations();
 });
+
+// Registrar MediatR
+//Básicamente, le dice a MediatR que busque en un ensamblado (en este caso, el que contiene la clase Program)
+//todas las clases que implementen IRequestHandler<TRequest,TResponse>, INotificationHandler<TNotification>
+//y demás tipos de handlers, para inyectarlas automáticamente.
+
+// 1. Registrar MediatR
+//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllVehiclesQuery).Assembly));
+
+
+// 2. Registrar FluentValidation (si lo usas con extension method)
+//builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(GetAllVehiclesQuery).Assembly);
+
+
+// 3. Registrar AutoMapper
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();
 

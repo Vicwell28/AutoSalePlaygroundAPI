@@ -1,4 +1,8 @@
-﻿using AutoSalePlaygroundAPI.Application.DTOs;
+﻿using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries;
+using AutoSalePlaygroundAPI.Application.DTOs;
+using AutoSalePlaygroundAPI.Application.DTOs.Response;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -8,174 +12,138 @@ namespace AutoSalePlaygroundAPI.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [SwaggerTag("Controlador para gestionar los Autos")]
-    public class VehicleController : ControllerBase
+    public class VehicleController(IMediator mediator) : ControllerBase
     {
-        // Simulación de una base de datos en memoria
-        private static readonly List<VehicleDto> Autos = new List<VehicleDto>
-        {
-            new VehicleDto { Id = 1, Marca = "Toyota", Modelo = "Corolla", Año = 2020, Precio = 20000 },
-            new VehicleDto { Id = 2, Marca = "Honda", Modelo = "Civic", Año = 2019, Precio = 18000 }
-        };
 
         /// <summary>
-        /// Obtiene la lista completa de autos.
+        /// Obtiene la lista completa de autos (vía CQRS).
         /// </summary>
-        /// <returns>Lista de autos.</returns>
         [HttpGet]
         [SwaggerOperation(Summary = "Obtiene todos los autos", Description = "Devuelve una lista completa de autos disponibles.")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Lista de autos obtenida exitosamente", typeof(IEnumerable<VehicleDto>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "Lista de autos obtenida exitosamente", typeof(ResponseDto<List<VehicleDto>>))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
-        public ActionResult<IEnumerable<VehicleDto>> GetAllAutos()
+        public async Task<IActionResult> GetAllAutos()
         {
-            try
+            var query = new GetAllVehiclesQuery();
+            var response = await mediator.Send(query);
+
+            if (!response.IsSuccess)
             {
-                return Ok(Autos);
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
-            catch (Exception ex)
-            {
-                // Log error (no implementado aquí)
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener los autos.");
-            }
+
+            return Ok(response);
         }
 
         /// <summary>
-        /// Obtiene un auto por su ID.
+        /// Obtiene un auto por su ID (vía CQRS).
         /// </summary>
         /// <param name="id">ID del auto.</param>
-        /// <returns>VehicleDto específico.</returns>
         [HttpGet("{id}")]
         [SwaggerOperation(Summary = "Obtiene un auto por ID", Description = "Devuelve los detalles de un auto específico según su ID.")]
-        [SwaggerResponse(StatusCodes.Status200OK, "VehicleDto obtenido exitosamente", typeof(VehicleDto))]
+        [SwaggerResponse(StatusCodes.Status200OK, "VehicleDto obtenido exitosamente", typeof(ResponseDto<VehicleDto>))]
         [SwaggerResponse(StatusCodes.Status404NotFound, "VehicleDto no encontrado")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
-        public ActionResult<VehicleDto> GetAutoById(int id)
+        public async Task<IActionResult> GetAutoById(int id)
         {
-            try
-            {
-                var auto = Autos.FirstOrDefault(a => a.Id == id);
+            var query = new GetVehicleByIdQuery(id);
+            var response = await mediator.Send(query);
 
-                if (auto == null)
-                {
-                    return NotFound($"VehicleDto con ID {id} no encontrado.");
-                }
-
-                return Ok(auto);
-            }
-            catch (Exception ex)
+            if (!response.IsSuccess)
             {
-                // Log error (no implementado aquí)
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener el auto.");
+                if (response.Code == "NOT_FOUND")
+                    return NotFound(response);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
+
+            return Ok(response);
         }
 
         /// <summary>
-        /// Crea un nuevo auto.
+        /// Crea un nuevo auto (vía CQRS).
         /// </summary>
         /// <param name="autoDto">Datos del nuevo auto.</param>
-        /// <returns>VehicleDto creado.</returns>
         [HttpPost]
         [SwaggerOperation(Summary = "Crea un nuevo auto", Description = "Añade un nuevo auto a la base de datos.")]
-        [SwaggerResponse(StatusCodes.Status201Created, "VehicleDto creado exitosamente", typeof(VehicleDto))]
+        [SwaggerResponse(StatusCodes.Status201Created, "VehicleDto creado exitosamente", typeof(ResponseDto<VehicleDto>))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Datos de entrada inválidos")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
-        public ActionResult<VehicleDto> CreateAuto([FromBody] VehicleDto autoDto)
+        public async Task<IActionResult> CreateAuto([FromBody] VehicleDto autoDto)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                var newAuto = new VehicleDto
-                {
-                    Id = Autos.Max(a => a.Id) + 1,
-                    Marca = autoDto.Marca,
-                    Modelo = autoDto.Modelo,
-                    Año = autoDto.Año,
-                    Precio = autoDto.Precio
-                };
-
-                Autos.Add(newAuto);
-
-                return CreatedAtAction(nameof(GetAutoById), new { id = newAuto.Id }, newAuto);
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
+
+            var command = new CreateVehicleCommand(autoDto.Marca, autoDto.Modelo, autoDto.Año, autoDto.Precio);
+            var response = await mediator.Send(command);
+
+            if (!response.IsSuccess)
             {
-                // Log error (no implementado aquí)
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error al crear el auto.");
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
+
+            // Podrías devolver 201 con la data creada
+            return Ok(response);
         }
 
         /// <summary>
-        /// Actualiza un auto existente.
+        /// Actualiza un auto existente (vía CQRS).
         /// </summary>
         /// <param name="id">ID del auto a actualizar.</param>
         /// <param name="autoDto">Nuevos datos del auto.</param>
-        /// <returns>No content.</returns>
         [HttpPut("{id}")]
         [SwaggerOperation(Summary = "Actualiza un auto", Description = "Modifica los detalles de un auto existente.")]
-        [SwaggerResponse(StatusCodes.Status204NoContent, "VehicleDto actualizado exitosamente")]
+        [SwaggerResponse(StatusCodes.Status200OK, "VehicleDto actualizado exitosamente", typeof(ResponseDto<VehicleDto>))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Datos de entrada inválidos")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "VehicleDto no encontrado")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
-        public IActionResult UpdateAuto(int id, [FromBody] VehicleDto autoDto)
+        public async Task<IActionResult> UpdateAuto(int id, [FromBody] VehicleDto autoDto)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                var existingAuto = Autos.FirstOrDefault(a => a.Id == id);
-                if (existingAuto == null)
-                {
-                    return NotFound($"VehicleDto con ID {id} no encontrado.");
-                }
-
-                existingAuto.Marca = autoDto.Marca;
-                existingAuto.Modelo = autoDto.Modelo;
-                existingAuto.Año = autoDto.Año;
-                existingAuto.Precio = autoDto.Precio;
-
-                return NoContent();
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
+
+            var command = new UpdateVehicleCommand(id, autoDto.Marca, autoDto.Modelo, autoDto.Año, autoDto.Precio);
+            var response = await mediator.Send(command);
+
+            if (!response.IsSuccess)
             {
-                // Log error (no implementado aquí)
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error al actualizar el auto.");
+                if (response.Code == "NOT_FOUND")
+                    return NotFound(response);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
+
+            return Ok(response);
         }
 
         /// <summary>
-        /// Elimina un auto por su ID.
+        /// Elimina un auto por su ID (vía CQRS).
         /// </summary>
         /// <param name="id">ID del auto a eliminar.</param>
-        /// <returns>No content.</returns>
         [HttpDelete("{id}")]
         [SwaggerOperation(Summary = "Elimina un auto", Description = "Elimina un auto específico según su ID.")]
-        [SwaggerResponse(StatusCodes.Status204NoContent, "VehicleDto eliminado exitosamente")]
+        [SwaggerResponse(StatusCodes.Status200OK, "VehicleDto eliminado exitosamente", typeof(ResponseDto<bool>))]
         [SwaggerResponse(StatusCodes.Status404NotFound, "VehicleDto no encontrado")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
-        public IActionResult DeleteAuto(int id)
+        public async Task<IActionResult> DeleteAuto(int id)
         {
-            try
-            {
-                var auto = Autos.FirstOrDefault(a => a.Id == id);
-                if (auto == null)
-                {
-                    return NotFound($"VehicleDto con ID {id} no encontrado.");
-                }
+            var command = new DeleteVehicleCommand(id);
+            var response = await mediator.Send(command);
 
-                Autos.Remove(auto);
-                return NoContent();
-            }
-            catch (Exception ex)
+            if (!response.IsSuccess)
             {
-                // Log error (no implementado aquí)
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error al eliminar el auto.");
+                if (response.Code == "NOT_FOUND")
+                    return NotFound(response);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
+
+            // Se eliminó con éxito
+            return Ok(response);
         }
     }
 }
