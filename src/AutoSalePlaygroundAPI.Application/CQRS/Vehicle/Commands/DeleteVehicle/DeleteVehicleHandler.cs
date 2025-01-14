@@ -1,21 +1,16 @@
 ﻿using AutoSalePlaygroundAPI.Application.DTOs.Response;
+using AutoSalePlaygroundAPI.CrossCutting.Exceptions;
 using MediatR;
 
-namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands
+namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.DeleteVehicle
 {
-    public record DeleteVehicleCommand(int Id) : IRequest<ResponseDto<bool>>;
-
     public class DeleteVehicleHandler : IRequestHandler<DeleteVehicleCommand, ResponseDto<bool>>
     {
         public Task<ResponseDto<bool>> Handle(DeleteVehicleCommand request, CancellationToken cancellationToken)
         {
             if (request.Id == 0)
             {
-                return Task.FromResult(ResponseDto<bool>.Error(
-                    message: "Vehículo no encontrado",
-                    errors: new List<string> { $"Vehicle con ID {request.Id} no existe" },
-                    code: "NOT_FOUND"
-                ));
+                throw new NotFoundException($"Vehículo con ID {request.Id} no encontrado.");
             }
 
             var response = ResponseDto<bool>.Success(true, "Vehículo eliminado con éxito");

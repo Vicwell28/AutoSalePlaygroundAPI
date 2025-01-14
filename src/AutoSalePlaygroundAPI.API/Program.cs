@@ -1,6 +1,6 @@
 using AutoSalePlaygroundAPI.API.Middlewares;
 using AutoSalePlaygroundAPI.Application.Behaviors;
-using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle;
 using AutoSalePlaygroundAPI.Application.Mappings;
 using FluentValidation;
 using MediatR;

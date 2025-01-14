@@ -2,10 +2,8 @@
 using AutoSalePlaygroundAPI.Application.DTOs.Response;
 using MediatR;
 
-namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries
+namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle
 {
-    public record GetAllVehiclesQuery : IRequest<ResponseDto<List<VehicleDto>>>;
-
     public class GetAllVehiclesHandler : IRequestHandler<GetAllVehiclesQuery, ResponseDto<List<VehicleDto>>>
     {
         public Task<ResponseDto<List<VehicleDto>>> Handle(GetAllVehiclesQuery request, CancellationToken cancellationToken)

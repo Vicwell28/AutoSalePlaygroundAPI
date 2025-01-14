@@ -1,14 +1,10 @@
 ﻿using AutoMapper;
 using AutoSalePlaygroundAPI.Application.DTOs;
 using AutoSalePlaygroundAPI.Application.DTOs.Response;
-using AutoSalePlaygroundAPI.Application.Interfaces;
 using MediatR;
 
-namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands
+namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.CreateVehicle
 {
-    public record CreateVehicleCommand(string Marca, string Modelo, int Año, decimal Precio)
-        : IRequest<ResponseDto<VehicleDto>>, IRequireValidation;
-
     public class CreateVehicleHandler(IMapper _mapper) : IRequestHandler<CreateVehicleCommand, ResponseDto<VehicleDto>>
     {
         public Task<ResponseDto<VehicleDto>> Handle(CreateVehicleCommand request, CancellationToken cancellationToken)

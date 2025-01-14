@@ -1,15 +1,18 @@
-﻿using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands;
-using AutoSalePlaygroundAPI.CrossCutting.Helpers;
+﻿using AutoSalePlaygroundAPI.CrossCutting.Helpers;
 using FluentValidation;
 
-namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Validations
+namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.UpdateVehicle
 {
-    public class CreateVehicleCommandValidator : AbstractValidator<CreateVehicleCommand>
+    public class UpdateVehicleCommandValidator : AbstractValidator<UpdateVehicleCommand>
     {
         private readonly List<string> _forbiddenWords = new() { "forbidden1", "forbidden2" };
 
-        public CreateVehicleCommandValidator()
+        public UpdateVehicleCommandValidator()
         {
+            // Validación para el ID
+            RuleFor(x => x.Id)
+                .GreaterThan(0).WithMessage("El ID debe ser mayor a 0.");
+
             // Validación para la Marca
             RuleFor(x => x.Marca)
                 .NotEmpty().WithMessage("La marca es requerida.")

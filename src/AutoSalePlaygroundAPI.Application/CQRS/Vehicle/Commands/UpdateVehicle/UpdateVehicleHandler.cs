@@ -1,22 +1,17 @@
 ﻿using AutoSalePlaygroundAPI.Application.DTOs;
 using AutoSalePlaygroundAPI.Application.DTOs.Response;
+using AutoSalePlaygroundAPI.CrossCutting.Exceptions;
 using MediatR;
 
-namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands
+namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.UpdateVehicle
 {
-    public record UpdateVehicleCommand(int Id, string Marca, string Modelo, int Año, decimal Precio) : IRequest<ResponseDto<VehicleDto>>;
-
     public class UpdateVehicleHandler : IRequestHandler<UpdateVehicleCommand, ResponseDto<VehicleDto>>
     {
         public Task<ResponseDto<VehicleDto>> Handle(UpdateVehicleCommand request, CancellationToken cancellationToken)
         {
             if (request.Id == 0)
             {
-                return Task.FromResult(ResponseDto<VehicleDto>.Error(
-                       message: "Vehículo no encontrado",
-                       errors: new List<string> { $"Vehicle con ID {request.Id} no existe" },
-                       code: "NOT_FOUND"
-                   ));
+                throw new NotFoundException($"Vehículo con ID {request.Id} no encontrado.");
             }
 
             var vehicle = new VehicleDto

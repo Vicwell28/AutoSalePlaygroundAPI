@@ -1,5 +1,8 @@
-﻿using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands;
-using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries;
+﻿using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.CreateVehicle;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.DeleteVehicle;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.UpdateVehicle;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehicleById;
 using AutoSalePlaygroundAPI.Application.DTOs;
 using AutoSalePlaygroundAPI.Application.DTOs.Response;
 using AutoSalePlaygroundAPI.CrossCutting.Constants;
@@ -15,7 +18,6 @@ namespace AutoSalePlaygroundAPI.API.Controllers
     [SwaggerTag("Controlador para gestionar los Autos")]
     public class VehicleController(IMediator mediator) : ControllerBase
     {
-
         /// <summary>
         /// Obtiene la lista completa de autos (vía CQRS).
         /// </summary>
