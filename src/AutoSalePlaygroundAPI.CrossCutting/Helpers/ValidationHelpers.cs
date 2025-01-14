@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using System.Text.RegularExpressions;
 
-namespace AutoSalePlaygroundAPI.CrossCutting.Extensions
+namespace AutoSalePlaygroundAPI.CrossCutting.Helpers
 {
     public static class ValidationHelpers
     {

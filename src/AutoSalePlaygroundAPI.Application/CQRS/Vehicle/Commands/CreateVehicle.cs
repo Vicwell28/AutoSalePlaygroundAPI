@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using AutoSalePlaygroundAPI.Application.Behaviors;
 using AutoSalePlaygroundAPI.Application.DTOs;
 using AutoSalePlaygroundAPI.Application.DTOs.Response;
+using AutoSalePlaygroundAPI.Application.Interfaces;
 using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands

@@ -1,5 +1,5 @@
 ﻿using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands;
-using AutoSalePlaygroundAPI.CrossCutting.Extensions;
+using AutoSalePlaygroundAPI.CrossCutting.Helpers;
 using FluentValidation;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Validations

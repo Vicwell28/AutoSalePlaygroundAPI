@@ -1,4 +1,6 @@
 ﻿using AutoSalePlaygroundAPI.Application.DTOs.Response;
+using AutoSalePlaygroundAPI.CrossCutting.Constants;
+using AutoSalePlaygroundAPI.CrossCutting.Exceptions;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -14,22 +16,46 @@ namespace AutoSalePlaygroundAPI.Application.Behaviors
         {
             try
             {
-                // Ejecuta el siguiente Behavior o el Handler final
                 var response = await next();
 
                 return response;
+            }
+            catch (NotFoundException ex)
+            {
+                _logger.LogError(ex, "Recurso no encontrado");
+
+                var errorResponse = new TResponse();
+
+                errorResponse.SetError(
+                    message: ex.Message,
+                    errors: new List<string> { ex.Message },
+                    code: ResponseCodes.NotFound);
+
+                return errorResponse;
+            }
+            catch (ConflictException ex)
+            {
+                _logger.LogError(ex, "Conflicto en la operación");
+
+                var errorResponse = new TResponse();
+
+                errorResponse.SetError(
+                    message: ex.Message,
+                    errors: new List<string> { ex.Message },
+                    code: ResponseCodes.Conflict);
+
+                return errorResponse;
             }
             catch (ValidationException ex)
             {
                 _logger.LogError(ex, "Excepción de validación en {RequestName}", typeof(TRequest).Name);
 
-                // Como TResponse hereda de BaseResponseDto, podemos construir uno
                 var errorResponse = new TResponse();
 
                 errorResponse.SetError(
                     message: "Error de validación",
                     errors: ex.Errors.Select(e => e.ErrorMessage).ToList(),
-                    code: "ERR-VALIDATION"
+                    code: ResponseCodes.ValidationError
                 );
 
                 return errorResponse;
@@ -38,13 +64,12 @@ namespace AutoSalePlaygroundAPI.Application.Behaviors
             {
                 _logger.LogError(ex, "Excepción en {RequestName}", typeof(TRequest).Name);
 
-                // Como TResponse hereda de BaseResponseDto, podemos construir uno
                 var errorResponse = new TResponse();
 
                 errorResponse.SetError(
                     message: "Error durante la ejecución del request",
                     errors: new List<string> { ex.Message },
-                    code: "ERR-UNHANDLED"
+                    code: ResponseCodes.UnexpectedError
                 );
 
                 return errorResponse;

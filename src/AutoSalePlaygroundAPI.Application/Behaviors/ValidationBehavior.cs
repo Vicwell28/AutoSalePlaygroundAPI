@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using AutoSalePlaygroundAPI.Application.Interfaces;
+using FluentValidation;
 using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.Behaviors

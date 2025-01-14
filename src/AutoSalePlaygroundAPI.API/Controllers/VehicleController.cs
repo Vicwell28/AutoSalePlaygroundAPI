@@ -2,6 +2,7 @@
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries;
 using AutoSalePlaygroundAPI.Application.DTOs;
 using AutoSalePlaygroundAPI.Application.DTOs.Response;
+using AutoSalePlaygroundAPI.CrossCutting.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -51,7 +52,7 @@ namespace AutoSalePlaygroundAPI.API.Controllers
 
             if (!response.IsSuccess)
             {
-                if (response.Code == "NOT_FOUND")
+                if (response.Code == ResponseCodes.NotFound)
                     return NotFound(response);
 
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
@@ -111,7 +112,7 @@ namespace AutoSalePlaygroundAPI.API.Controllers
 
             if (!response.IsSuccess)
             {
-                if (response.Code == "NOT_FOUND")
+                if (response.Code == ResponseCodes.NotFound)
                     return NotFound(response);
 
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
@@ -136,7 +137,7 @@ namespace AutoSalePlaygroundAPI.API.Controllers
 
             if (!response.IsSuccess)
             {
-                if (response.Code == "NOT_FOUND")
+                if (response.Code == ResponseCodes.NotFound)
                     return NotFound(response);
 
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
