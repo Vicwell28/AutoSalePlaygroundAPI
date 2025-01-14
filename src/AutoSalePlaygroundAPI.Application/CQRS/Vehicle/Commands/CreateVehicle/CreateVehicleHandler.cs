@@ -9,22 +9,23 @@ namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.CreateVehicle
     {
         public Task<ResponseDto<VehicleDto>> Handle(CreateVehicleCommand request, CancellationToken cancellationToken)
         {
-            // Ejemplo de una entidad en memoria
-            var vehicleEntity = new Domain.Entities.Vehicle
-            {
-                // En la vida real, Id lo generas en la DB
-                Marca = request.Marca,
-                Modelo = request.Modelo,
-                Año = request.Año,
-                Precio = request.Precio
-            };
+            throw new NotImplementedException("Handler not implemented");
+            //// Ejemplo de una entidad en memoria
+            //var vehicleEntity = new Vehicle
+            //{
+            //    // En la vida real, Id lo generas en la DB
+            //    Marca = request.Marca,
+            //    Modelo = request.Modelo,
+            //    Año = request.Año,
+            //    Precio = request.Precio
+            //};
 
-            // Devuelves un VehicleDto usando AutoMapper
-            var dto = _mapper.Map<VehicleDto>(vehicleEntity);
+            //// Devuelves un VehicleDto usando AutoMapper
+            //var dto = _mapper.Map<VehicleDto>(vehicleEntity);
 
-            var response = ResponseDto<VehicleDto>.Success(dto, "Vehículo creado con éxito");
+            //var response = ResponseDto<VehicleDto>.Success(dto, "Vehículo creado con éxito");
 
-            return Task.FromResult(response);
+            //return Task.FromResult(response);
         }
     }
 }

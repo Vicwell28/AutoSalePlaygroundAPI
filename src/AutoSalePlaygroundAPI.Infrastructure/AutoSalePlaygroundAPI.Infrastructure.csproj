@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DbContexts\" />
     <Folder Include="Migrations\" />
     <Folder Include="Caching\" />
+    <Folder Include="Interfaces\" />
     <Folder Include="UnitOfWork\" />
     <Folder Include="Repositories\" />
   </ItemGroup>
