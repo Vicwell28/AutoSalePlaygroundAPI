@@ -1,6 +1,9 @@
 using AutoSalePlaygroundAPI.API.Middlewares;
+using AutoSalePlaygroundAPI.Application.Behaviors;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries;
+using AutoSalePlaygroundAPI.Application.Mappings;
 using FluentValidation;
+using MediatR;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,7 +40,12 @@ builder.Services.AddValidatorsFromAssembly(typeof(GetAllVehiclesQuery).Assembly)
 
 
 // 3. Registrar AutoMapper
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddAutoMapper(typeof(VehicleProfile).Assembly);
+
+// Registrar Pipeline Behavior para validación
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExceptionHandlingBehavior<,>));
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 var app = builder.Build();
 

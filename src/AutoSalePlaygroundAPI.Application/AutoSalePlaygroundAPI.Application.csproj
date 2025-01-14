@@ -7,8 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Behaviors\" />
-    <Folder Include="Mappings\" />
     <Folder Include="Interfaces\" />
     <Folder Include="Services\" />
   </ItemGroup>
@@ -19,9 +17,12 @@
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
     <PackageReference Include="MediatR" Version="12.4.1" />
     <PackageReference Include="MediatR.Extensions.Autofac.DependencyInjection" Version="12.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AutoSalePlaygroundAPI.CrossCutting\AutoSalePlaygroundAPI.CrossCutting.csproj" />
+    <ProjectReference Include="..\AutoSalePlaygroundAPI.Domain\AutoSalePlaygroundAPI.Domain.csproj" />
     <ProjectReference Include="..\AutoSalePlaygroundAPI.Infrastructure\AutoSalePlaygroundAPI.Infrastructure.csproj" />
   </ItemGroup>
 

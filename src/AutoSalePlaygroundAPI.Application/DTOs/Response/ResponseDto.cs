@@ -12,7 +12,7 @@
         }
 
         //Cracion de metodos estaticos para su respuesta 
-        public static ResponseDto<T> Success(T data, string message = null, string code = null)
+        public static ResponseDto<T> Success(T data, string? message = null, string? code = null)
         {
             var response = new ResponseDto<T>
             {
@@ -22,7 +22,7 @@
             return response;
         }
 
-        public static ResponseDto<T> Error(string message, List<string> errors, string code = null)
+        public static ResponseDto<T> Error(string message, List<string> errors, string? code = null)
         {
             var response = new ResponseDto<T>();
             response.SetError(message, errors, code);
