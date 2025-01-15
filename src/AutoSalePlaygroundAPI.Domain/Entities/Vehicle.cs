@@ -1,4 +1,5 @@
-﻿using AutoSalePlaygroundAPI.Domain.DomainEvent;
+﻿using Ardalis.GuardClauses;
+using AutoSalePlaygroundAPI.Domain.DomainEvent;
 using AutoSalePlaygroundAPI.Domain.ValueObjects;
 
 namespace AutoSalePlaygroundAPI.Domain.Entities
@@ -9,14 +10,16 @@ namespace AutoSalePlaygroundAPI.Domain.Entities
         public int OwnerId { get; private set; }
         public virtual Owner Owner { get; private set; } = null!;
         public Specifications Specifications { get; private set; } = null!;
-
-        // Many-to-many relationship with Accessories
         public virtual ICollection<Accessory> Accessories { get; private set; } = new List<Accessory>();
 
         private Vehicle() { }
 
         public Vehicle(string licensePlateNumber, Owner owner, Specifications specifications)
         {
+            Guard.Against.NullOrWhiteSpace(licensePlateNumber, nameof(licensePlateNumber), "El número de placa no puede ser nulo o vacío.");
+            Guard.Against.Null(owner, nameof(owner), "El propietario no puede ser nulo.");
+            Guard.Against.Null(specifications, nameof(specifications), "Las especificaciones no pueden ser nulas.");
+
             LicensePlateNumber = licensePlateNumber;
             Owner = owner;
             OwnerId = owner.Id;
@@ -25,6 +28,8 @@ namespace AutoSalePlaygroundAPI.Domain.Entities
 
         public void ChangeOwner(Owner newOwner)
         {
+            Guard.Against.Null(newOwner, nameof(newOwner), "El nuevo propietario no puede ser nulo.");
+
             var oldOwnerId = this.OwnerId;
             this.Owner = newOwner;
             this.OwnerId = newOwner.Id;
@@ -36,6 +41,8 @@ namespace AutoSalePlaygroundAPI.Domain.Entities
 
         public void UpdateLicensePlate(string newLicensePlateNumber)
         {
+            Guard.Against.NullOrWhiteSpace(newLicensePlateNumber, nameof(newLicensePlateNumber), "El nuevo número de placa no puede ser nulo o vacío.");
+
             var oldPlate = this.LicensePlateNumber;
             this.LicensePlateNumber = newLicensePlateNumber;
             MarkUpdated();
@@ -46,8 +53,7 @@ namespace AutoSalePlaygroundAPI.Domain.Entities
 
         public void AddAccessory(Accessory accessory)
         {
-            if (accessory == null)
-                throw new ArgumentNullException(nameof(accessory));
+            Guard.Against.Null(accessory, nameof(accessory), "Se intentó agregar un accesorio nulo.");
 
             Accessories.Add(accessory);
             MarkUpdated();
@@ -58,6 +64,10 @@ namespace AutoSalePlaygroundAPI.Domain.Entities
 
         public void UpdateSpecifications(string fuelType, int engineDisplacement, int horsepower)
         {
+            Guard.Against.NullOrWhiteSpace(fuelType, nameof(fuelType), "El tipo de combustible no puede ser nulo o vacío.");
+            Guard.Against.NegativeOrZero(engineDisplacement, nameof(engineDisplacement), "La cilindrada del motor debe ser mayor que cero.");
+            Guard.Against.NegativeOrZero(horsepower, nameof(horsepower), "La potencia del motor debe ser mayor que cero.");
+
             var oldSpecs = this.Specifications;
             this.Specifications = new Specifications(fuelType, engineDisplacement, horsepower);
             MarkUpdated();

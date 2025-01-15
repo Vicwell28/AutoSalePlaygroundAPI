@@ -10,6 +10,7 @@ namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.CreateVehicle
         public Task<ResponseDto<VehicleDto>> Handle(CreateVehicleCommand request, CancellationToken cancellationToken)
         {
             throw new NotImplementedException("Handler not implemented");
+
             //// Ejemplo de una entidad en memoria
             //var vehicleEntity = new Vehicle
             //{
