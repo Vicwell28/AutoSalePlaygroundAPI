@@ -1,6 +1,5 @@
 ﻿using Ardalis.GuardClauses;
 using AutoSalePlaygroundAPI.Domain.DomainEvent;
-using AutoSalePlaygroundAPI.Domain.ValueObjects;
 
 namespace AutoSalePlaygroundAPI.Domain.Entities
 {
@@ -9,12 +8,12 @@ namespace AutoSalePlaygroundAPI.Domain.Entities
         public string LicensePlateNumber { get; private set; } = null!;
         public int OwnerId { get; private set; }
         public virtual Owner Owner { get; private set; } = null!;
-        public Specifications Specifications { get; private set; } = null!;
+        public ValueObjects.Specifications Specifications { get; private set; } = null!;
         public virtual ICollection<Accessory> Accessories { get; private set; } = new List<Accessory>();
 
         private Vehicle() { }
 
-        public Vehicle(string licensePlateNumber, Owner owner, Specifications specifications)
+        public Vehicle(string licensePlateNumber, Owner owner, ValueObjects.Specifications specifications)
         {
             Guard.Against.NullOrWhiteSpace(licensePlateNumber, nameof(licensePlateNumber), "El número de placa no puede ser nulo o vacío.");
             Guard.Against.Null(owner, nameof(owner), "El propietario no puede ser nulo.");
@@ -69,7 +68,7 @@ namespace AutoSalePlaygroundAPI.Domain.Entities
             Guard.Against.NegativeOrZero(horsepower, nameof(horsepower), "La potencia del motor debe ser mayor que cero.");
 
             var oldSpecs = this.Specifications;
-            this.Specifications = new Specifications(fuelType, engineDisplacement, horsepower);
+            this.Specifications = new ValueObjects.Specifications(fuelType, engineDisplacement, horsepower);
             MarkUpdated();
 
             // Raise a domain event

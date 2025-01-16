@@ -120,7 +120,6 @@ namespace AutoSalePlaygroundAPI.Infrastructure.DbContexts
                         NewValues = $"NewName={au.NewName}",
                         OccurredOn = au.OccurredOn
                     };
-
                 default:
                     return null;
             }
