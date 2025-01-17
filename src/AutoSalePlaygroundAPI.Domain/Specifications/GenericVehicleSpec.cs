@@ -1,4 +1,5 @@
 ﻿using AutoSalePlaygroundAPI.Domain.Entities;
+using AutoSalePlaygroundAPI.Domain.Specifications.Base;
 using System.Linq.Expressions;
 
 namespace AutoSalePlaygroundAPI.Domain.Specifications

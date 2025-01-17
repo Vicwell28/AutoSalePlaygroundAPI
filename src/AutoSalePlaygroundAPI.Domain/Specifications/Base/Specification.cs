@@ -1,7 +1,7 @@
 ﻿using AutoSalePlaygroundAPI.Domain.Interfaces;
 using System.Linq.Expressions;
 
-namespace AutoSalePlaygroundAPI.Domain.Specifications
+namespace AutoSalePlaygroundAPI.Domain.Specifications.Base
 {
     public abstract class Specification<T> : ISpecification<T>
     {

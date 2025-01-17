@@ -2,11 +2,19 @@ using AutoSalePlaygroundAPI.API.Middlewares;
 using AutoSalePlaygroundAPI.Application.Behaviors;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle;
 using AutoSalePlaygroundAPI.Application.Mappings;
+using AutoSalePlaygroundAPI.Infrastructure;
 using FluentValidation;
 using MediatR;
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+using AutoSalePlaygroundAPI.Infrastructure.DbContexts;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//builder.Services.AddDbContext<AutoSalePlaygroundAPIDbContext>(options =>
+//{
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("AutoSaleDb"));
+//}, ServiceLifetime.Scoped);
 
 // Agregar servicios al contenedor.
 builder.Services.AddControllers();
@@ -42,10 +50,13 @@ builder.Services.AddValidatorsFromAssembly(typeof(GetAllVehiclesQuery).Assembly)
 // 3. Registrar AutoMapper
 builder.Services.AddAutoMapper(typeof(VehicleProfile).Assembly);
 
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 // Registrar Pipeline Behavior para validación
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExceptionHandlingBehavior<,>));
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
 
 var app = builder.Build();
 

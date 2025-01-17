@@ -3,6 +3,7 @@ using AutoSalePlaygroundAPI.Infrastructure.DbContexts;
 using AutoSalePlaygroundAPI.Infrastructure.Interfaces;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace AutoSalePlaygroundAPI.Infrastructure.Repositories
 {
@@ -19,31 +20,19 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Repositories
         {
             IQueryable<T> query = _dbContext.Set<T>();
 
-            // Aplicar Criteria (filtros)
             if (specification.Criteria != null)
-            {
-                // Usamos AsExpandable() si combinamos expresiones LinqKit
                 query = query.AsExpandable().Where(specification.Criteria);
-            }
 
-            // Aplicar Includes
             foreach (var includeExpression in specification.Includes)
-            {
                 query = query.Include(includeExpression);
-            }
 
-            // Aplicar ordenamientos
             foreach (var orderExp in specification.OrderExpressions)
-            {
                 query = orderExp(query);
-            }
 
-            // Paginación
             if (specification.IsPagingEnabled)
             {
                 if (specification.Skip.HasValue)
                     query = query.Skip(specification.Skip.Value);
-
                 if (specification.Take.HasValue)
                     query = query.Take(specification.Take.Value);
             }
@@ -56,30 +45,71 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Repositories
             IQueryable<T> query = _dbContext.Set<T>();
 
             if (specification.Criteria != null)
-            {
                 query = query.AsExpandable().Where(specification.Criteria);
-            }
 
             foreach (var includeExpression in specification.Includes)
-            {
                 query = query.Include(includeExpression);
-            }
 
             foreach (var orderExp in specification.OrderExpressions)
-            {
                 query = orderExp(query);
-            }
 
             if (specification.IsPagingEnabled)
             {
                 if (specification.Skip.HasValue)
                     query = query.Skip(specification.Skip.Value);
-
                 if (specification.Take.HasValue)
                     query = query.Take(specification.Take.Value);
             }
 
             return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<List<TResult>> ListSelectAsync<TResult>(ISpecification<T> specification, Expression<Func<T, TResult>> selector)
+        {
+            IQueryable<T> query = _dbContext.Set<T>().AsQueryable();
+
+            if (specification.Criteria != null)
+                query = query.AsExpandable().Where(specification.Criteria);
+
+            foreach (var includeExpression in specification.Includes)
+                query = query.Include(includeExpression);
+
+            foreach (var orderExp in specification.OrderExpressions)
+                query = orderExp(query);
+
+            if (specification.IsPagingEnabled)
+            {
+                if (specification.Skip.HasValue)
+                    query = query.Skip(specification.Skip.Value);
+                if (specification.Take.HasValue)
+                    query = query.Take(specification.Take.Value);
+            }
+
+            return await query.Select(selector).ToListAsync();
+        }
+
+        public async Task<TResult?> FirstOrDefaultAsync<TResult>(ISpecification<T> specification, Expression<Func<T, TResult>> selector)
+        {
+            IQueryable<T> query = _dbContext.Set<T>().AsQueryable();
+
+            if (specification.Criteria != null)
+                query = query.AsExpandable().Where(specification.Criteria);
+
+            foreach (var includeExpression in specification.Includes)
+                query = query.Include(includeExpression);
+
+            foreach (var orderExp in specification.OrderExpressions)
+                query = orderExp(query);
+
+            if (specification.IsPagingEnabled)
+            {
+                if (specification.Skip.HasValue)
+                    query = query.Skip(specification.Skip.Value);
+                if (specification.Take.HasValue)
+                    query = query.Take(specification.Take.Value);
+            }
+
+            return await query.Select(selector).FirstOrDefaultAsync();
         }
     }
 }

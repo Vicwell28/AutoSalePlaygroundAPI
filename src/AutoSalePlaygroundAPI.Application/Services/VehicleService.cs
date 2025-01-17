@@ -4,15 +4,8 @@ using AutoSalePlaygroundAPI.Infrastructure.Interfaces;
 
 namespace AutoSalePlaygroundAPI.Application.Services
 {
-    public class VehicleService
+    public class VehicleService(IRepository<Vehicle> _vehicleRepository)
     {
-        private readonly IRepository<Vehicle> _vehicleRepository;
-
-        public VehicleService(IRepository<Vehicle> vehicleRepository)
-        {
-            _vehicleRepository = vehicleRepository;
-        }
-
         public async Task<List<Vehicle>> GetActiveVehiclesByOwnerAsync(int ownerId)
         {
             var spec = new VehicleActiveByOwnerSpec(ownerId);
@@ -25,6 +18,20 @@ namespace AutoSalePlaygroundAPI.Application.Services
             var spec = new GenericVehicleSpec(v => v.Id == vehicleId);
 
             return await _vehicleRepository.FirstOrDefaultAsync(spec);
+        }
+
+        public async Task<List<int>> GetVehicleIdsActiveByOwner(int ownerId)
+        {
+            var spec = new VehicleActiveByOwnerSpec(ownerId);
+
+            return await _vehicleRepository.ListSelectAsync(spec, v => v.Id);
+        }
+
+        public async Task<int> GetVehicleIdActiveByOwner(int ownerId)
+        {
+            var spec = new VehicleActiveByOwnerSpec(ownerId);
+
+            return await _vehicleRepository.FirstOrDefaultAsync(spec, v => v.Id);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoSalePlaygroundAPI.Domain.Interfaces;
+using System.Linq.Expressions;
 
 namespace AutoSalePlaygroundAPI.Infrastructure.Interfaces
 {
@@ -6,6 +7,8 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Interfaces
     {
         Task<List<T>> ListAsync(ISpecification<T> specification);
         Task<T?> FirstOrDefaultAsync(ISpecification<T> specification);
+        Task<List<TResult>> ListSelectAsync<TResult>(ISpecification<T> specification, Expression<Func<T, TResult>> selector);
+        Task<TResult?> FirstOrDefaultAsync<TResult>(ISpecification<T> specification, Expression<Func<T, TResult>> selector);
     }
 }
 

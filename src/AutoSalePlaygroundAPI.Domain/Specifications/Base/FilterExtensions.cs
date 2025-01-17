@@ -1,8 +1,9 @@
 ﻿using AutoSalePlaygroundAPI.Domain.Interfaces;
+using AutoSalePlaygroundAPI.Domain.Specifications.Base;
 using LinqKit;
 using System.Linq.Expressions;
 
-namespace AutoSalePlaygroundAPI.Domain.Specifications
+namespace AutoSalePlaygroundAPI.Domain.Specifications.Base
 {
     public static class FilterExtensions
     {

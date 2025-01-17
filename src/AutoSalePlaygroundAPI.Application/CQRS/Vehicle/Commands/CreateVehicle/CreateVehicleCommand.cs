@@ -1,10 +1,9 @@
 ﻿using AutoSalePlaygroundAPI.Application.DTOs;
 using AutoSalePlaygroundAPI.Application.DTOs.Response;
 using AutoSalePlaygroundAPI.Application.Interfaces;
-using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.CreateVehicle
 {
     public record CreateVehicleCommand(string Marca, string Modelo, int Año, decimal Precio)
-        : IRequest<ResponseDto<VehicleDto>>, IRequireValidation;
+        : ICommand<ResponseDto<VehicleDto>>, IRequireValidation;
 }

@@ -2,7 +2,7 @@
 using AutoSalePlaygroundAPI.Domain.Interfaces;
 using System.Linq.Expressions;
 
-namespace AutoSalePlaygroundAPI.Domain.Specifications
+namespace AutoSalePlaygroundAPI.Domain.Specifications.Filters
 {
     public class VehicleByOwnerFilter : IFilter<Vehicle>
     {

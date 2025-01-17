@@ -1,4 +1,6 @@
 ﻿using AutoSalePlaygroundAPI.Domain.Entities;
+using AutoSalePlaygroundAPI.Domain.Specifications.Base;
+using AutoSalePlaygroundAPI.Domain.Specifications.Filters;
 
 namespace AutoSalePlaygroundAPI.Domain.Specifications
 {
