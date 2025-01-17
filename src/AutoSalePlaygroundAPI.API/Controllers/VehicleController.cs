@@ -3,6 +3,7 @@ using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.DeleteVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.UpdateVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehicleById;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehiclesByOwnerPaged;
 using AutoSalePlaygroundAPI.Application.DTOs;
 using AutoSalePlaygroundAPI.Application.DTOs.Response;
 using AutoSalePlaygroundAPI.CrossCutting.Constants;
@@ -87,7 +88,6 @@ namespace AutoSalePlaygroundAPI.API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
 
-            // Podrías devolver 201 con la data creada
             return Ok(response);
         }
 
@@ -145,7 +145,6 @@ namespace AutoSalePlaygroundAPI.API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
 
-            // Se eliminó con éxito
             return Ok(response);
         }
     }

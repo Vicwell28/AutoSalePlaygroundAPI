@@ -33,5 +33,14 @@ namespace AutoSalePlaygroundAPI.Application.Services
 
             return await _vehicleRepository.FirstOrDefaultAsync(spec, v => v.Id);
         }
+
+        public async Task<(List<Vehicle>, int totalCount)> GetActiveVehiclesByOwnerPaged(int ownerId, int pageNumber, int pageSize)
+        {
+            var spec = new VehicleActiveByOwnerPagedSpec(ownerId, pageNumber, pageSize);
+
+            var (vehicles, totalCount) = await _vehicleRepository.ListPaginatedAsync(spec);
+
+            return (vehicles, totalCount);
+        }
     }
 }

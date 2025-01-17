@@ -3,9 +3,9 @@
     public class BaseResponseDto
     {
         public bool IsSuccess => Errors == null || !Errors.Any();
-        public string? Message { get; set; }
-        public List<string>? Errors { get; set; }
-        public string? Code { get; set; }
+        public string? Message { get; protected set; }
+        public List<string>? Errors { get; protected set; }
+        public string? Code { get; protected set; }
 
         public virtual void SetSuccess(string? message = null, string? code = null)
         {

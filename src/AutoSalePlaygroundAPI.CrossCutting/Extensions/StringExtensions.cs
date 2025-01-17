@@ -15,7 +15,7 @@
             return null;
         }
 
-        public static string Truncate(this string value, int maxLength)
+        public static string? Truncate(this string value, int maxLength)
         {
             if (value == null) return null;
 

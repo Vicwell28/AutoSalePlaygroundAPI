@@ -2,7 +2,7 @@
 {
     public class ResponseDto<T> : BaseResponseDto
     {
-        public T? Data { get; set; }
+        public T? Data { get; protected set; }
 
         public virtual void SetSuccess(T data, string? message = null, string? code = null)
         {

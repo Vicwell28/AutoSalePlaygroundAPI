@@ -47,7 +47,7 @@ namespace AutoSalePlaygroundAPI.Infrastructure.DbContexts
             return result;
         }
 
-        private AuditLog MapDomainEventToAuditLog(IDomainEvent domainEvent)
+        private AuditLog? MapDomainEventToAuditLog(IDomainEvent domainEvent)
         {
             switch (domainEvent)
             {

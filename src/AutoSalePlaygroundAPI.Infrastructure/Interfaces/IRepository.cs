@@ -9,6 +9,7 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Interfaces
         Task<T?> FirstOrDefaultAsync(ISpecification<T> specification);
         Task<List<TResult>> ListSelectAsync<TResult>(ISpecification<T> specification, Expression<Func<T, TResult>> selector);
         Task<TResult?> FirstOrDefaultAsync<TResult>(ISpecification<T> specification, Expression<Func<T, TResult>> selector);
+        Task<(List<T> Data, int TotalCount)> ListPaginatedAsync(ISpecification<T> specification, CancellationToken cancellationToken = default);
     }
 }
 

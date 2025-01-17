@@ -2,10 +2,12 @@
 {
     public class PaginatedResponseDto<T> : ResponseDto<IEnumerable<T>>
     {
-        public int CurrentPage { get; set; }
-        public int PageSize { get; set; }
-        public int TotalCount { get; set; }
+        public int CurrentPage { get; protected set; }
+        public int PageSize { get; protected set; }
+        public int TotalCount { get; protected set; }
         public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
+        public bool HasPrevious => CurrentPage > 1;
+        public bool HasNext => CurrentPage < TotalPages;
 
         public void SetPaginationData(int currentPage, int pageSize, int totalCount)
         {

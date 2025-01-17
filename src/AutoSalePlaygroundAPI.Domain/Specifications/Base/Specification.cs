@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace AutoSalePlaygroundAPI.Domain.Specifications.Base
 {
-    public abstract class Specification<T> : ISpecification<T>
+    public class Specification<T> : ISpecification<T>
     {
         public virtual Expression<Func<T, bool>>? Criteria { get; protected set; }
         public List<Expression<Func<T, object>>> Includes { get; } = new();
@@ -15,7 +15,7 @@ namespace AutoSalePlaygroundAPI.Domain.Specifications.Base
         /// <summary>
         /// Agrega un Include para Eager Loading.
         /// </summary>
-        protected void AddInclude(Expression<Func<T, object>> includeExpression)
+        public void AddInclude(Expression<Func<T, object>> includeExpression)
         {
             Includes.Add(includeExpression);
         }
@@ -23,7 +23,7 @@ namespace AutoSalePlaygroundAPI.Domain.Specifications.Base
         /// <summary>
         /// Asigna la expresión Criteria. Típicamente se usa en el constructor o en métodos tipo "Where(...)".
         /// </summary>
-        protected void SetCriteria(Expression<Func<T, bool>> criteria)
+        public void SetCriteria(Expression<Func<T, bool>> criteria)
         {
             Criteria = criteria;
         }
@@ -31,7 +31,7 @@ namespace AutoSalePlaygroundAPI.Domain.Specifications.Base
         /// <summary>
         /// Agrega un ordenamiento ascendente.
         /// </summary>
-        protected void AddOrderBy<TKey>(Expression<Func<T, TKey>> keySelector)
+        public void AddOrderBy<TKey>(Expression<Func<T, TKey>> keySelector)
         {
             OrderExpressions.Add(query => query.OrderBy(keySelector));
         }
@@ -39,7 +39,7 @@ namespace AutoSalePlaygroundAPI.Domain.Specifications.Base
         /// <summary>
         /// Agrega un ordenamiento descendente.
         /// </summary>
-        protected void AddOrderByDescending<TKey>(Expression<Func<T, TKey>> keySelector)
+        public void AddOrderByDescending<TKey>(Expression<Func<T, TKey>> keySelector)
         {
             OrderExpressions.Add(query => query.OrderByDescending(keySelector));
         }
@@ -47,7 +47,7 @@ namespace AutoSalePlaygroundAPI.Domain.Specifications.Base
         /// <summary>
         /// Configura la paginación.
         /// </summary>
-        protected void ApplyPaging(int skip, int take)
+        public void ApplyPaging(int skip, int take)
         {
             Skip = skip;
             Take = take;
