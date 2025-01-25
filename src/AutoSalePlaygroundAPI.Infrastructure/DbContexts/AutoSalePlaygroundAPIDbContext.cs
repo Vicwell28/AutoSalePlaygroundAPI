@@ -11,7 +11,7 @@ namespace AutoSalePlaygroundAPI.Infrastructure.DbContexts
         public DbSet<Owner> Owners { get; set; }
         public DbSet<Accessory> Accessories { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
-
+        public AutoSalePlaygroundAPIDbContext() { }
         public AutoSalePlaygroundAPIDbContext(DbContextOptions<AutoSalePlaygroundAPIDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -23,6 +23,18 @@ namespace AutoSalePlaygroundAPI.Infrastructure.DbContexts
 
             base.OnModelCreating(modelBuilder);
         }
+
+        // Con el unico proposito de hacer las migraciones
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("");
+            }
+            base.OnConfiguring(optionsBuilder);
+        }
+
+
 
         public override int SaveChanges()
         {

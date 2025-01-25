@@ -10,7 +10,7 @@ namespace AutoSalePlaygroundAPI.Domain.Entities
         // Many-to-many relationship with Vehicles
         public virtual ICollection<Vehicle> Vehicles { get; private set; } = new List<Vehicle>();
 
-        private Accessory() { }
+        protected Accessory() { }
 
         public Accessory(string name)
         {

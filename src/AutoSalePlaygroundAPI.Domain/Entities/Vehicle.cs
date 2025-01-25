@@ -11,7 +11,7 @@ namespace AutoSalePlaygroundAPI.Domain.Entities
         public ValueObjects.Specifications Specifications { get; private set; } = null!;
         public virtual ICollection<Accessory> Accessories { get; private set; } = new List<Accessory>();
 
-        private Vehicle() { }
+        protected Vehicle() { }
 
         public Vehicle(string licensePlateNumber, Owner owner, ValueObjects.Specifications specifications)
         {

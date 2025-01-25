@@ -11,7 +11,7 @@ namespace AutoSalePlaygroundAPI.Domain.Entities
         // Relationship: One Owner -> Many Vehicles
         public virtual ICollection<Vehicle> Vehicles { get; private set; } = new List<Vehicle>();
 
-        private Owner() { }
+        protected Owner() { }
 
         public Owner(string firstName, string lastName)
         {
