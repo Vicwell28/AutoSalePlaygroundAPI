@@ -1,4 +1,5 @@
-﻿using AutoSalePlaygroundAPI.Domain.Interfaces;
+﻿using AutoSalePlaygroundAPI.Domain.Entities;
+using AutoSalePlaygroundAPI.Domain.Interfaces;
 using AutoSalePlaygroundAPI.Infrastructure.DbContexts;
 using AutoSalePlaygroundAPI.Infrastructure.Interfaces;
 using LinqKit;
@@ -7,108 +8,77 @@ using System.Linq.Expressions;
 
 namespace AutoSalePlaygroundAPI.Infrastructure.Repositories
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public class Repository<T> : IRepository<T> where T : class, IEntity
     {
         private readonly AutoSalePlaygroundAPIDbContext _dbContext;
 
         public Repository(AutoSalePlaygroundAPIDbContext dbContext)
         {
-            _dbContext = dbContext;
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+        }
+
+        //CRUD METODOS
+        public async Task Add(T entity)
+        {
+            await _dbContext.Set<T>().AddAsync(entity);
+        }
+
+        public void Update(T entity)
+        {
+            _dbContext.Set<T>().Update(entity);
+        }
+
+        public void Delete(T entity)
+        {
+            _dbContext.Set<T>().Remove(entity);
+        }
+
+        public async Task AddRagne(IEnumerable<T> entities)
+        {
+            await _dbContext.Set<T>().AddRangeAsync(entities);
+        }
+
+        public void UpdateRange(IEnumerable<T> entities)
+        {
+            _dbContext.Set<T>().UpdateRange(entities);
+        }
+
+        public void DeleteRange(IEnumerable<T> entities)
+        {
+            _dbContext.Set<T>().RemoveRange(entities);
+        }
+
+        public async Task<bool> AnyAsync(ISpecification<T> specification)
+        {
+            var query = ApplySpecification(_dbContext.Set<T>(), specification, ignorePaging: false);
+            return await query.AnyAsync();
         }
 
         public async Task<List<T>> ListAsync(ISpecification<T> specification)
         {
-            IQueryable<T> query = _dbContext.Set<T>();
-
-            if (specification.Criteria != null)
-                query = query.AsExpandable().Where(specification.Criteria);
-
-            foreach (var includeExpression in specification.Includes)
-                query = query.Include(includeExpression);
-
-            foreach (var orderExp in specification.OrderExpressions)
-                query = orderExp(query);
-
-            if (specification.IsPagingEnabled)
-            {
-                if (specification.Skip.HasValue)
-                    query = query.Skip(specification.Skip.Value);
-                if (specification.Take.HasValue)
-                    query = query.Take(specification.Take.Value);
-            }
-
+            var query = ApplySpecification(_dbContext.Set<T>(), specification, ignorePaging: false);
             return await query.ToListAsync();
         }
 
         public async Task<T?> FirstOrDefaultAsync(ISpecification<T> specification)
         {
-            IQueryable<T> query = _dbContext.Set<T>();
-
-            if (specification.Criteria != null)
-                query = query.AsExpandable().Where(specification.Criteria);
-
-            foreach (var includeExpression in specification.Includes)
-                query = query.Include(includeExpression);
-
-            foreach (var orderExp in specification.OrderExpressions)
-                query = orderExp(query);
-
-            if (specification.IsPagingEnabled)
-            {
-                if (specification.Skip.HasValue)
-                    query = query.Skip(specification.Skip.Value);
-                if (specification.Take.HasValue)
-                    query = query.Take(specification.Take.Value);
-            }
-
+            var query = ApplySpecification(_dbContext.Set<T>(), specification, ignorePaging: false);
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<List<TResult>> ListSelectAsync<TResult>(ISpecification<T> specification, Expression<Func<T, TResult>> selector)
+        public async Task<List<TResult>> ListAsync<TResult>(
+            ISpecification<T> specification,
+            Expression<Func<T, TResult>> selector)
         {
-            IQueryable<T> query = _dbContext.Set<T>().AsQueryable();
-
-            if (specification.Criteria != null)
-                query = query.AsExpandable().Where(specification.Criteria);
-
-            foreach (var includeExpression in specification.Includes)
-                query = query.Include(includeExpression);
-
-            foreach (var orderExp in specification.OrderExpressions)
-                query = orderExp(query);
-
-            if (specification.IsPagingEnabled)
-            {
-                if (specification.Skip.HasValue)
-                    query = query.Skip(specification.Skip.Value);
-                if (specification.Take.HasValue)
-                    query = query.Take(specification.Take.Value);
-            }
-
+            var query = ApplySpecification(_dbContext.Set<T>(), specification, ignorePaging: false);
             return await query.Select(selector).ToListAsync();
         }
 
-        public async Task<TResult?> FirstOrDefaultAsync<TResult>(ISpecification<T> specification, Expression<Func<T, TResult>> selector)
+        public async Task<TResult?> FirstOrDefaultAsync<TResult>(
+            ISpecification<T> specification,
+            Expression<Func<T, TResult>> selector)
         {
-            IQueryable<T> query = _dbContext.Set<T>().AsQueryable();
-
-            if (specification.Criteria != null)
-                query = query.AsExpandable().Where(specification.Criteria);
-
-            foreach (var includeExpression in specification.Includes)
-                query = query.Include(includeExpression);
-
-            foreach (var orderExp in specification.OrderExpressions)
-                query = orderExp(query);
-
-            if (specification.IsPagingEnabled)
-            {
-                if (specification.Skip.HasValue)
-                    query = query.Skip(specification.Skip.Value);
-                if (specification.Take.HasValue)
-                    query = query.Take(specification.Take.Value);
-            }
-
+            var query = ApplySpecification(_dbContext.Set<T>(), specification, ignorePaging: false);
             return await query.Select(selector).FirstOrDefaultAsync();
         }
 
@@ -127,6 +97,12 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Repositories
             return (items, totalCount);
         }
 
+        /// <summary>
+        /// Aplica Criteria, Includes, Ordenamiento y, opcionalmente, paginación.
+        /// </summary>
+        /// <param name="inputQuery">Query base (DbSet).</param>
+        /// <param name="specification">Specification con criterios, includes, etc.</param>
+        /// <param name="ignorePaging">Si es true, omite la paginación.</param>
         private IQueryable<T> ApplySpecification(
             IQueryable<T> inputQuery,
             ISpecification<T> specification,
@@ -135,14 +111,20 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Repositories
             // 1) Criteria (Where)
             if (specification.Criteria is not null)
             {
-                // Usar AsExpandable si lo requieres por LinqKit
                 inputQuery = inputQuery.AsExpandable().Where(specification.Criteria);
             }
 
-            // 2) Includes
+            // 2) Includes con expresiones "tradicionales"
             foreach (var includeExpression in specification.Includes)
             {
                 inputQuery = inputQuery.Include(includeExpression);
+            }
+
+            // 2.2) NUEVO: Includes con Func<IQueryable<T>, IIncludableQueryable<T, object>>
+            // para soportar ThenInclude.
+            foreach (var includeFunc in specification.IncludeExpressions)
+            {
+                inputQuery = includeFunc(inputQuery);
             }
 
             // 3) Ordenamientos
@@ -163,5 +145,6 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Repositories
 
             return inputQuery;
         }
+
     }
 }

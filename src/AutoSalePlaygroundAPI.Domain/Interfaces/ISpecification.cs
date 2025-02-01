@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Expressions;
 
 namespace AutoSalePlaygroundAPI.Domain.Interfaces
 {
@@ -11,8 +12,15 @@ namespace AutoSalePlaygroundAPI.Domain.Interfaces
 
         /// <summary>
         /// Listado de expresiones para incluir entidades relacionadas (Eager Loading).
+        /// Incluye el patrón tradicional (ej. Include(x => x.Relation)).
         /// </summary>
         List<Expression<Func<T, object>>> Includes { get; }
+
+        /// <summary>
+        /// NUEVO: Listado de funciones para incluir entidades relacionadas
+        /// que retornan IIncludableQueryable, soportando ThenInclude.
+        /// </summary>
+        List<Func<IQueryable<T>, IIncludableQueryable<T, object>>> IncludeExpressions { get; }
 
         /// <summary>
         /// Lista de funciones que aplican ordenamientos al IQueryable.

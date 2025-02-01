@@ -1,23 +1,26 @@
 ﻿using AutoSalePlaygroundAPI.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AutoSalePlaygroundAPI.Domain.Specifications.Base;
+using Microsoft.EntityFrameworkCore;
 
 namespace AutoSalePlaygroundAPI.Domain.Specifications
 {
-    public class VehicleActiveByOwnerPagedSpec : PagedSpecification<Vehicle>
+    public class VehicleActiveByOwnerPagedSpec : Specification<Vehicle>
     {
         public VehicleActiveByOwnerPagedSpec(int ownerId, int pageNumber, int pageSize)
-            : base(v => v.IsActive && v.OwnerId == ownerId, pageNumber, pageSize)
         {
-            // Includes para Eager Loading
-            AddInclude(v => v.Owner);
-            AddInclude(v => v.Accessories);
+            SetCriteria(v => v.IsActive && v.OwnerId == ownerId);
 
-            // Ordenamiento
+            AddInclude(vehiclesQuery => vehiclesQuery
+                .Include(v => v.Owner)
+            //.ThenInclude(owner => owner.Direcciones)
+            //.ThenInclude(direc => direc.Barrio)
+            );
+
+            AddInclude(vehiclesQuery => vehiclesQuery.Include(v => v.Accessories));
+
             AddOrderByDescending(v => v.UpdatedAt);
+
+            ApplyPaging((pageNumber - 1) * pageSize, pageSize);
         }
     }
 }
