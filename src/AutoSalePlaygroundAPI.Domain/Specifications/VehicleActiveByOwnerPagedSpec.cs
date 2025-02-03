@@ -1,23 +1,35 @@
 ﻿using AutoSalePlaygroundAPI.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AutoSalePlaygroundAPI.Domain.Specifications.Base;
+using AutoSalePlaygroundAPI.Domain.Specifications.Filters;
+using Microsoft.EntityFrameworkCore;
 
 namespace AutoSalePlaygroundAPI.Domain.Specifications
 {
-    public class VehicleActiveByOwnerPagedSpec : PagedSpecification<Vehicle>
+    /// <summary>
+    /// Especificación para obtener vehículos activos de un propietario con paginación.
+    /// </summary>
+    public class VehicleActiveByOwnerPagedSpec : Specification<Vehicle>
     {
         public VehicleActiveByOwnerPagedSpec(int ownerId, int pageNumber, int pageSize)
-            : base(v => v.IsActive && v.OwnerId == ownerId, pageNumber, pageSize)
         {
-            // Includes para Eager Loading
-            AddInclude(v => v.Owner);
-            AddInclude(v => v.Accessories);
+            // 1) Combinación de filtros con LinqKit
+            var ownerFilter = new VehicleByOwnerFilter(ownerId);
+            var activeFilter = new ActiveFilter<Vehicle>();
+            var combined = ownerFilter.And(activeFilter);
 
-            // Ordenamiento
+            SetCriteria(combined.ToExpression());
+
+            AddInclude(vehiclesQuery => vehiclesQuery
+                .Include(v => v.Owner)
+                // Si fuera necesario, se pueden incluir relaciones anidadas:
+                //.ThenInclude(owner => owner.Direcciones)
+                );
+
+            AddInclude(vehiclesQuery => vehiclesQuery.Include(v => v.Accessories));
+
             AddOrderByDescending(v => v.UpdatedAt);
+
+            ApplyPaging((pageNumber - 1) * pageSize, pageSize);
         }
     }
 }

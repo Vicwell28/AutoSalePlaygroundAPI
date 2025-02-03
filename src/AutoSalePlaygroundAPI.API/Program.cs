@@ -17,7 +17,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<AutoSalePlaygroundAPIDbContext>(options =>
 {
-    options.UseSqlServer(connectionString);
+    options.UseSqlServer(connectionString)
+    .EnableSensitiveDataLogging()
+    .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information);
 }, ServiceLifetime.Scoped);
 
 // Agregar servicios al contenedor.

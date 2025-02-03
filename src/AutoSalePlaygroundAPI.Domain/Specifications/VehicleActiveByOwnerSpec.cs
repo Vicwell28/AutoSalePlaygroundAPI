@@ -1,9 +1,13 @@
 ﻿using AutoSalePlaygroundAPI.Domain.Entities;
 using AutoSalePlaygroundAPI.Domain.Specifications.Base;
 using AutoSalePlaygroundAPI.Domain.Specifications.Filters;
+using Microsoft.EntityFrameworkCore;
 
 namespace AutoSalePlaygroundAPI.Domain.Specifications
 {
+    /// <summary>
+    /// Especificación para obtener vehículos activos pertenecientes a un propietario específico.
+    /// </summary>
     public class VehicleActiveByOwnerSpec : Specification<Vehicle>
     {
         public VehicleActiveByOwnerSpec(int ownerId)
@@ -17,8 +21,8 @@ namespace AutoSalePlaygroundAPI.Domain.Specifications
             SetCriteria(combined.ToExpression());
 
             // 3) Incluimos la navegación con Eager Loading
-            AddInclude(v => v.Owner);
-            AddInclude(v => v.Accessories);
+            AddInclude(vehiclesQuery => vehiclesQuery.Include(v => v.Owner));
+            AddInclude(vehiclesQuery => vehiclesQuery.Include(v => v.Accessories));
 
             // 4) Ordenamos por fecha de actualización descendente
             AddOrderByDescending(v => v.UpdatedAt);

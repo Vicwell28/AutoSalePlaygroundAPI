@@ -4,5 +4,6 @@ using AutoSalePlaygroundAPI.Application.Interfaces;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehicleById
 {
-    public record GetVehicleByIdQuery(int Id) : IQuery<ResponseDto<VehicleDto>>, IRequireValidation;
+    public record GetVehicleByIdQuery(int VehicleId)
+        : IQuery<ResponseDto<VehicleDto>>, IRequireValidation;
 }

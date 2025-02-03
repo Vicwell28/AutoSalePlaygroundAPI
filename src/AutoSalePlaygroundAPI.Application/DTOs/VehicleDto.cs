@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AutoSalePlaygroundAPI.Application.DTOs
+﻿namespace AutoSalePlaygroundAPI.Application.DTOs
 {
     public class VehicleDto
     {
@@ -17,5 +11,15 @@ namespace AutoSalePlaygroundAPI.Application.DTOs
         public int Año { get; set; }
 
         public decimal Precio { get; set; }
+
+        public string LicensePlateNumber { get; set; } = string.Empty;
+
+        public int OwnerId { get; set; }
+
+        public string FuelType { get; set; } = string.Empty;
+
+        public int EngineDisplacement { get; set; }
+
+        public int Horsepower { get; set; }
     }
 }

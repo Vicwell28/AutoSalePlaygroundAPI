@@ -3,7 +3,6 @@ using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.DeleteVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.UpdateVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehicleById;
-using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehiclesByOwnerPaged;
 using AutoSalePlaygroundAPI.Application.DTOs;
 using AutoSalePlaygroundAPI.Application.DTOs.Response;
 using AutoSalePlaygroundAPI.CrossCutting.Constants;
@@ -80,7 +79,7 @@ namespace AutoSalePlaygroundAPI.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var command = new CreateVehicleCommand(autoDto.Marca, autoDto.Modelo, autoDto.Año, autoDto.Precio);
+            var command = new CreateVehicleCommand(autoDto.LicensePlateNumber, autoDto.OwnerId, autoDto.FuelType, autoDto.EngineDisplacement, autoDto.Horsepower);
             var response = await mediator.Send(command);
 
             if (!response.IsSuccess)

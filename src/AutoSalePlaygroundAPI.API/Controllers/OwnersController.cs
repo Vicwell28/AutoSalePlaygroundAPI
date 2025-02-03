@@ -1,6 +1,6 @@
-﻿using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehiclesByOwnerPaged;
-using AutoSalePlaygroundAPI.Application.DTOs.Response;
+﻿using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetActiveVehiclesByOwnerPaged;
 using AutoSalePlaygroundAPI.Application.DTOs;
+using AutoSalePlaygroundAPI.Application.DTOs.Response;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -32,7 +32,7 @@ namespace AutoSalePlaygroundAPI.API.Controllers
             [FromQuery] int pageSize = 10,
             CancellationToken cancellationToken = default)
         {
-            var query = new GetVehiclesByOwnerPagedQuery(ownerId, pageNumber, pageSize);
+            var query = new GetActiveVehiclesByOwnerPagedQuery(ownerId, pageNumber, pageSize);
             var result = await _mediator.Send(query, cancellationToken);
 
             if (!result.IsSuccess)

@@ -4,6 +4,14 @@ using AutoSalePlaygroundAPI.Application.Interfaces;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.CreateVehicle
 {
-    public record CreateVehicleCommand(string Marca, string Modelo, int Año, decimal Precio)
-        : ICommand<ResponseDto<VehicleDto>>, IRequireValidation;
+    /// <summary>
+    /// Comando para crear un vehículo.
+    /// </summary>
+    public record CreateVehicleCommand(
+        string LicensePlateNumber,
+        int OwnerId,
+        string FuelType,
+        int EngineDisplacement,
+        int Horsepower
+    ) : ICommand<ResponseDto<VehicleDto>>, IRequireValidation;
 }

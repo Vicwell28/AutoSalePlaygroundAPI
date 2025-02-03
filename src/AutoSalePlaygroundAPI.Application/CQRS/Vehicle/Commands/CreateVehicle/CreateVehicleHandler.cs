@@ -1,32 +1,47 @@
 ﻿using AutoMapper;
 using AutoSalePlaygroundAPI.Application.DTOs;
 using AutoSalePlaygroundAPI.Application.DTOs.Response;
+using AutoSalePlaygroundAPI.Application.Interfaces;
+using AutoSalePlaygroundAPI.Domain.ValueObjects;
 using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.CreateVehicle
 {
-    public class CreateVehicleHandler(IMapper _mapper) : IRequestHandler<CreateVehicleCommand, ResponseDto<VehicleDto>>
+    public class CreateVehicleHandler : IRequestHandler<CreateVehicleCommand, ResponseDto<VehicleDto>>
     {
-        public Task<ResponseDto<VehicleDto>> Handle(CreateVehicleCommand request, CancellationToken cancellationToken)
+        private readonly IMapper _mapper;
+        private readonly IOwnerService _ownerService;
+        private readonly IVehicleService _vehicleService;
+
+        public CreateVehicleHandler(
+            IOwnerService ownerService,
+            IVehicleService vehicleService,
+            IMapper mapper)
         {
-            throw new NotImplementedException("Handler not implemented");
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _ownerService = ownerService ?? throw new ArgumentNullException(nameof(ownerService));
+            _vehicleService = vehicleService ?? throw new ArgumentNullException(nameof(vehicleService));
+        }
 
-            //// Ejemplo de una entidad en memoria
-            //var vehicleEntity = new Vehicle
-            //{
-            //    // En la vida real, Id lo generas en la DB
-            //    Marca = request.Marca,
-            //    Modelo = request.Modelo,
-            //    Año = request.Año,
-            //    Precio = request.Precio
-            //};
+        public async Task<ResponseDto<VehicleDto>> Handle(CreateVehicleCommand request, CancellationToken cancellationToken)
+        {
+            // Buscar el propietario según OwnerId
+            var owner = await _ownerService.GetOwnerByIdAsync(request.OwnerId);
+            if (owner == null)
+            {
+                throw new InvalidDataException("Propietario no encontrado");
+            }
 
-            //// Devuelves un VehicleDto usando AutoMapper
-            //var dto = _mapper.Map<VehicleDto>(vehicleEntity);
+            // Crear las especificaciones
+            var specifications = new Specifications(request.FuelType, request.EngineDisplacement, request.Horsepower);
 
-            //var response = ResponseDto<VehicleDto>.Success(dto, "Vehículo creado con éxito");
+            // Crear la entidad Vehicle
+            var vehicle = await _vehicleService.AddNewVehicleAsync(request.LicensePlateNumber, owner, specifications);
 
-            //return Task.FromResult(response);
+            // Mapear la entidad a VehicleDto
+            var vehicleDto = _mapper.Map<VehicleDto>(vehicle);
+
+            return ResponseDto<VehicleDto>.Success(vehicleDto, "Vehículo creado con éxito");
         }
     }
 }

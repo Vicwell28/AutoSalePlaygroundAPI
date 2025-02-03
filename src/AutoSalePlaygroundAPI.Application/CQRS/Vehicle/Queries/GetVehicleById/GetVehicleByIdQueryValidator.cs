@@ -6,8 +6,8 @@ namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehicleById
     {
         public GetVehicleByIdQueryValidator()
         {
-            RuleFor(q => q.Id)
-                .GreaterThan(0).WithMessage("El ID debe ser mayor a 0.");
+            RuleFor(x => x.VehicleId)
+                .GreaterThan(0).WithMessage("El Id del vehículo debe ser mayor que 0.");
         }
     }
 }

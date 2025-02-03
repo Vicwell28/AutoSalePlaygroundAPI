@@ -1,23 +1,44 @@
-﻿using AutoSalePlaygroundAPI.Domain.Interfaces;
+﻿using AutoSalePlaygroundAPI.Domain.Entities;
+using AutoSalePlaygroundAPI.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
 namespace AutoSalePlaygroundAPI.Domain.Specifications.Base
 {
-    public class Specification<T> : ISpecification<T>
+    public class Specification<T> : ISpecification<T> where T : class, IEntity
     {
+        // (1) Filtro principal: Criteria
         public virtual Expression<Func<T, bool>>? Criteria { get; protected set; }
+
+        // (2) Esto se mantiene si quieres seguir usando Includes tipo Expression<Func<T, object>>
         public List<Expression<Func<T, object>>> Includes { get; } = new();
+
+        // (3) NUEVO: Lista de funciones que reciben un IQueryable y retornan un IIncludableQueryable
+        public List<Func<IQueryable<T>, IIncludableQueryable<T, object>>> IncludeExpressions { get; }
+            = new List<Func<IQueryable<T>, IIncludableQueryable<T, object>>>();
+
+        // (4) Ordenamientos
         public List<Func<IQueryable<T>, IOrderedQueryable<T>>> OrderExpressions { get; } = new();
+
+        // (5) Paginación
         public int? Skip { get; protected set; }
         public int? Take { get; protected set; }
         public bool IsPagingEnabled => Skip.HasValue || Take.HasValue;
 
         /// <summary>
-        /// Agrega un Include para Eager Loading.
+        /// Agrega un Include (versión “tradicional”, sin ThenInclude).
         /// </summary>
         public void AddInclude(Expression<Func<T, object>> includeExpression)
         {
             Includes.Add(includeExpression);
+        }
+
+        /// <summary>
+        /// NUEVO: Agrega un Include que retorna un IIncludableQueryable para permitir ThenInclude.
+        /// </summary>
+        public void AddInclude(Func<IQueryable<T>, IIncludableQueryable<T, object>> includeExpression)
+        {
+            IncludeExpressions.Add(includeExpression);
         }
 
         /// <summary>

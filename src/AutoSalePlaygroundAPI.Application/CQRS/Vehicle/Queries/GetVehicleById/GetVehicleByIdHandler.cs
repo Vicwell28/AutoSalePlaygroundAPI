@@ -1,31 +1,36 @@
-﻿using AutoSalePlaygroundAPI.Application.DTOs;
+﻿using AutoMapper;
+using AutoSalePlaygroundAPI.Application.DTOs;
 using AutoSalePlaygroundAPI.Application.DTOs.Response;
-using AutoSalePlaygroundAPI.CrossCutting.Exceptions;
+using AutoSalePlaygroundAPI.Application.Interfaces;
 using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehicleById
 {
     public class GetVehicleByIdHandler : IRequestHandler<GetVehicleByIdQuery, ResponseDto<VehicleDto>>
     {
-        public Task<ResponseDto<VehicleDto>> Handle(GetVehicleByIdQuery request, CancellationToken cancellationToken)
+        private readonly IVehicleService _vehicleService;
+        private readonly IMapper _mapper;
+
+        public GetVehicleByIdHandler(
+            IVehicleService vehicleService,
+            IMapper mapper)
         {
-            if (request.Id == 0)
+            _vehicleService = vehicleService ?? throw new ArgumentNullException(nameof(vehicleService));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        }
+
+        public async Task<ResponseDto<VehicleDto>> Handle(GetVehicleByIdQuery request, CancellationToken cancellationToken)
+        {
+            var vehicle = await _vehicleService.GetVehicleByIdAsync(request.VehicleId);
+
+            if (vehicle == null)
             {
-                throw new NotFoundException($"Vehículo con ID {request.Id} no encontrado.");
+                throw new Exception("Vehículo no encontrado");
             }
 
-            var vehicle = new VehicleDto
-            {
-                Id = request.Id,
-                Marca = "Ford",
-                Modelo = "Fiesta",
-                Año = 2022,
-                Precio = 10000
-            };
+            var vehicleDto = _mapper.Map<VehicleDto>(vehicle);
 
-            var response = ResponseDto<VehicleDto>.Success(vehicle, "Vehículo encontrado con éxito");
-
-            return Task.FromResult(response);
+            return ResponseDto<VehicleDto>.Success(vehicleDto);
         }
     }
 }
