@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using AutoSalePlaygroundAPI.Infrastructure.DbContexts;
 using AutoSalePlaygroundAPI.Infrastructure.Interfaces;
 using AutoSalePlaygroundAPI.Infrastructure.Repositories;
+using AutoSalePlaygroundAPI.Application.Interfaces;
+using AutoSalePlaygroundAPI.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,8 +49,14 @@ builder.Services.AddValidatorsFromAssembly(typeof(GetAllVehiclesQuery).Assembly)
 // Registrar AutoMapper
 builder.Services.AddAutoMapper(typeof(VehicleProfile).Assembly);
 
+// Registro del repositorio genérico y Unit of Work:
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Registro de los servicios de aplicación:
+builder.Services.AddScoped<IAccessoryService, AccessoryService>();
+builder.Services.AddScoped<IOwnerService, OwnerService>();
+builder.Services.AddScoped<IVehicleService, VehicleService>();
 
 // Registrar Pipeline Behavior para validación
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));

@@ -23,7 +23,8 @@ namespace AutoSalePlaygroundAPI.Application.Services
         public async Task<Owner?> GetOwnerByIdAsync(int ownerId)
         {
             // Se asume que existe una especificación genérica para propietarios.
-            var spec = new GenericOwnerSpec(o => o.Id == ownerId);
+            var spec = new OwnerActiveSpec(ownerId);
+            //var spec = new GenericOwnerSpec(o => o.Id == ownerId);
             return await _ownerRepository.FirstOrDefaultAsync(spec);
         }
 

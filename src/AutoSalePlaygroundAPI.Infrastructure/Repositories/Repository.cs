@@ -227,7 +227,7 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Repositories
             // 1) Aplicar el filtro principal (Criteria)
             if (specification.Criteria is not null)
             {
-                inputQuery = inputQuery.AsExpandable().Where(specification.Criteria);
+                inputQuery = inputQuery.Where(specification.Criteria);
             }
 
             // 2) Aplicar los Includes (método tradicional)

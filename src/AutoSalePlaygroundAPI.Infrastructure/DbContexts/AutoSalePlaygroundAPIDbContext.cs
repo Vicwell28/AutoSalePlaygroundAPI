@@ -7,12 +7,15 @@ namespace AutoSalePlaygroundAPI.Infrastructure.DbContexts
 {
     public class AutoSalePlaygroundAPIDbContext : DbContext
     {
+        public AutoSalePlaygroundAPIDbContext(DbContextOptions<AutoSalePlaygroundAPIDbContext> options)
+            : base(options)
+        {
+        }
+
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<Owner> Owners { get; set; }
         public DbSet<Accessory> Accessories { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
-        public AutoSalePlaygroundAPIDbContext() { }
-        public AutoSalePlaygroundAPIDbContext(DbContextOptions<AutoSalePlaygroundAPIDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,23 +28,27 @@ namespace AutoSalePlaygroundAPI.Infrastructure.DbContexts
         }
 
         // Con el unico proposito de hacer las migraciones
+        /*
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("");
+                // Esto solo se ejecutará si las opciones no fueron configuradas.
+                optionsBuilder.UseSqlServer("TuCadenaDeConexionPorDefecto");
             }
             base.OnConfiguring(optionsBuilder);
         }
-
-
+        */
 
         public override int SaveChanges()
         {
+            // Obtén los eventos de dominio pendientes
             var domainEvents = new List<IDomainEvent>(DomainEvents.Events);
 
+            // Guarda los cambios en la base de datos
             var result = base.SaveChanges();
 
+            // Recorre y mapea cada evento de dominio a un registro de auditoría
             foreach (var domainEvent in domainEvents)
             {
                 var auditLog = MapDomainEventToAuditLog(domainEvent);
@@ -52,8 +59,8 @@ namespace AutoSalePlaygroundAPI.Infrastructure.DbContexts
                 }
             }
 
+            // Limpia la lista de eventos de dominio y guarda nuevamente para persistir los logs
             DomainEvents.Clear();
-
             base.SaveChanges();
 
             return result;
@@ -132,6 +139,7 @@ namespace AutoSalePlaygroundAPI.Infrastructure.DbContexts
                         NewValues = $"NewName={au.NewName}",
                         OccurredOn = au.OccurredOn
                     };
+
                 default:
                     return null;
             }

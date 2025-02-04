@@ -1,4 +1,5 @@
-﻿using AutoSalePlaygroundAPI.Domain.Entities;
+﻿
+ using AutoSalePlaygroundAPI.Domain.Entities;
 using AutoSalePlaygroundAPI.Domain.Interfaces;
 using System.Linq.Expressions;
 
