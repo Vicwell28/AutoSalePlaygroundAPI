@@ -1,17 +1,17 @@
 using AutoSalePlaygroundAPI.API.Middlewares;
 using AutoSalePlaygroundAPI.Application.Behaviors;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle;
+using AutoSalePlaygroundAPI.Application.Interfaces;
 using AutoSalePlaygroundAPI.Application.Mappings;
+using AutoSalePlaygroundAPI.Application.Services;
 using AutoSalePlaygroundAPI.Infrastructure;
-using FluentValidation;
-using MediatR;
-using Microsoft.OpenApi.Models;
-using Microsoft.EntityFrameworkCore;
 using AutoSalePlaygroundAPI.Infrastructure.DbContexts;
 using AutoSalePlaygroundAPI.Infrastructure.Interfaces;
 using AutoSalePlaygroundAPI.Infrastructure.Repositories;
-using AutoSalePlaygroundAPI.Application.Interfaces;
-using AutoSalePlaygroundAPI.Application.Services;
+using FluentValidation;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,7 +62,7 @@ builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExceptionHandlingBehavior<,>));
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-builder.Services.AddTransient(typeof(IPipelineBehavior<,>),  typeof(TransactionBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
 
 var app = builder.Build();
 

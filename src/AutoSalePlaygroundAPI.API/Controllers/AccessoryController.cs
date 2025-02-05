@@ -1,8 +1,8 @@
-﻿using AutoSalePlaygroundAPI.Application.CQRS.Owner.Commands.CreateOwner;
-using AutoSalePlaygroundAPI.Application.CQRS.Owner.Commands.DeleteOwner;
-using AutoSalePlaygroundAPI.Application.CQRS.Owner.Commands.UpdateOwner;
-using AutoSalePlaygroundAPI.Application.CQRS.Owner.Queries.GetAllOwners;
-using AutoSalePlaygroundAPI.Application.CQRS.Owner.Queries.GetOwnerById;
+﻿using AutoSalePlaygroundAPI.Application.CQRS.Accessory.Commands.CreateAccessory;
+using AutoSalePlaygroundAPI.Application.CQRS.Accessory.Commands.DeleteAccessory;
+using AutoSalePlaygroundAPI.Application.CQRS.Accessory.Commands.UpdateAccessory;
+using AutoSalePlaygroundAPI.Application.CQRS.Accessory.Queries.GetAccessoryById;
+using AutoSalePlaygroundAPI.Application.CQRS.Accessory.Queries.GetAllAccessories;
 using AutoSalePlaygroundAPI.Application.DTOs;
 using AutoSalePlaygroundAPI.Application.DTOs.Response;
 using AutoSalePlaygroundAPI.CrossCutting.Constants;
@@ -14,25 +14,25 @@ namespace AutoSalePlaygroundAPI.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [SwaggerTag("Controlador para gestionar los Propietarios")]
-    public class OwnerController : ControllerBase
+    [SwaggerTag("Controlador para gestionar los Accesorios")]
+    public class AccessoryController : ControllerBase
     {
         private readonly IMediator _mediator;
-        public OwnerController(IMediator mediator)
+        public AccessoryController(IMediator mediator)
         {
             _mediator = mediator;
         }
 
         [HttpGet]
         [SwaggerOperation(
-            Summary = "Obtiene todos los propietarios",
-            Description = "Devuelve una lista completa de propietarios activos."
+            Summary = "Obtiene todos los accesorios",
+            Description = "Devuelve una lista completa de accesorios activos."
         )]
-        [SwaggerResponse(StatusCodes.Status200OK, "Lista de propietarios obtenida exitosamente", typeof(ResponseDto<List<OwnerDto>>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "Lista de accesorios obtenida exitosamente", typeof(ResponseDto<List<AccessoryDto>>))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
-        public async Task<IActionResult> GetAllOwners()
+        public async Task<IActionResult> GetAllAccessories()
         {
-            var query = new GetAllOwnersQuery();
+            var query = new GetAllAccessoriesQuery();
             var response = await _mediator.Send(query);
             if (!response.IsSuccess)
             {
@@ -43,15 +43,15 @@ namespace AutoSalePlaygroundAPI.API.Controllers
 
         [HttpGet("{id}")]
         [SwaggerOperation(
-            Summary = "Obtiene un propietario por ID",
-            Description = "Devuelve los detalles de un propietario específico según su ID."
+            Summary = "Obtiene un accesorio por ID",
+            Description = "Devuelve los detalles de un accesorio específico según su ID."
         )]
-        [SwaggerResponse(StatusCodes.Status200OK, "OwnerDto obtenido exitosamente", typeof(ResponseDto<OwnerDto>))]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "OwnerDto no encontrado")]
+        [SwaggerResponse(StatusCodes.Status200OK, "AccessoryDto obtenido exitosamente", typeof(ResponseDto<AccessoryDto>))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "AccessoryDto no encontrado")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
-        public async Task<IActionResult> GetOwnerById(int id)
+        public async Task<IActionResult> GetAccessoryById(int id)
         {
-            var query = new GetOwnerByIdQuery(id);
+            var query = new GetAccessoryByIdQuery(id);
             var response = await _mediator.Send(query);
             if (!response.IsSuccess)
             {
@@ -64,19 +64,19 @@ namespace AutoSalePlaygroundAPI.API.Controllers
 
         [HttpPost]
         [SwaggerOperation(
-            Summary = "Crea un nuevo propietario",
-            Description = "Añade un nuevo propietario a la base de datos."
+            Summary = "Crea un nuevo accesorio",
+            Description = "Añade un nuevo accesorio a la base de datos."
         )]
-        [SwaggerResponse(StatusCodes.Status201Created, "OwnerDto creado exitosamente", typeof(ResponseDto<OwnerDto>))]
+        [SwaggerResponse(StatusCodes.Status201Created, "AccessoryDto creado exitosamente", typeof(ResponseDto<AccessoryDto>))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Datos de entrada inválidos")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
-        public async Task<IActionResult> CreateOwner([FromBody] OwnerDto ownerDto)
+        public async Task<IActionResult> CreateAccessory([FromBody] AccessoryDto accessoryDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var command = new CreateOwnerCommand(ownerDto.FirstName, ownerDto.LastName);
+            var command = new CreateAccessoryCommand(accessoryDto.Name);
             var response = await _mediator.Send(command);
             if (!response.IsSuccess)
             {
@@ -87,20 +87,20 @@ namespace AutoSalePlaygroundAPI.API.Controllers
 
         [HttpPut("{id}")]
         [SwaggerOperation(
-            Summary = "Actualiza un propietario",
-            Description = "Modifica los detalles de un propietario existente."
+            Summary = "Actualiza un accesorio",
+            Description = "Modifica los detalles de un accesorio existente."
         )]
-        [SwaggerResponse(StatusCodes.Status200OK, "OwnerDto actualizado exitosamente", typeof(ResponseDto<OwnerDto>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "AccessoryDto actualizado exitosamente", typeof(ResponseDto<AccessoryDto>))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Datos de entrada inválidos")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "OwnerDto no encontrado")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "AccessoryDto no encontrado")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
-        public async Task<IActionResult> UpdateOwner(int id, [FromBody] OwnerDto ownerDto)
+        public async Task<IActionResult> UpdateAccessory(int id, [FromBody] AccessoryDto accessoryDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var command = new UpdateOwnerCommand(id, ownerDto.FirstName, ownerDto.LastName);
+            var command = new UpdateAccessoryCommand(id, accessoryDto.Name);
             var response = await _mediator.Send(command);
             if (!response.IsSuccess)
             {
@@ -113,15 +113,15 @@ namespace AutoSalePlaygroundAPI.API.Controllers
 
         [HttpDelete("{id}")]
         [SwaggerOperation(
-            Summary = "Elimina un propietario",
-            Description = "Elimina (o desactiva) un propietario específico según su ID."
+            Summary = "Elimina un accesorio",
+            Description = "Elimina un accesorio específico según su ID."
         )]
-        [SwaggerResponse(StatusCodes.Status200OK, "OwnerDto eliminado exitosamente", typeof(ResponseDto<bool>))]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "OwnerDto no encontrado")]
+        [SwaggerResponse(StatusCodes.Status200OK, "AccessoryDto eliminado exitosamente", typeof(ResponseDto<bool>))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "AccessoryDto no encontrado")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
-        public async Task<IActionResult> DeleteOwner(int id)
+        public async Task<IActionResult> DeleteAccessory(int id)
         {
-            var command = new DeleteOwnerCommand(id);
+            var command = new DeleteAccessoryCommand(id);
             var response = await _mediator.Send(command);
             if (!response.IsSuccess)
             {

@@ -2,7 +2,6 @@
 using AutoSalePlaygroundAPI.Domain.Interfaces;
 using AutoSalePlaygroundAPI.Infrastructure.DbContexts;
 using AutoSalePlaygroundAPI.Infrastructure.Interfaces;
-using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
@@ -13,9 +12,11 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Repositories
     {
         private readonly AutoSalePlaygroundAPIDbContext _dbContext;
 
+        public AutoSalePlaygroundAPIDbContext DbContext => _dbContext;
+
         public Repository(AutoSalePlaygroundAPIDbContext dbContext)
         {
-            _dbContext = dbContext;
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
         #region Métodos CRUD

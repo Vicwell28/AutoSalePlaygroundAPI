@@ -1,5 +1,6 @@
 ﻿using AutoSalePlaygroundAPI.Domain.Entities;
 using AutoSalePlaygroundAPI.Domain.Interfaces;
+using AutoSalePlaygroundAPI.Infrastructure.DbContexts;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Query;
 
@@ -9,10 +10,17 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Interfaces
     /// Define el contrato para el repositorio genérico que gestiona operaciones de acceso a datos.
     /// Permite realizar operaciones CRUD, consultas mediante especificaciones, agregaciones y operaciones en masa.
     /// </summary>
-    /// <typeparam name="T">Tipo de entidad que implementa IEntity.</typeparam>
+    /// <typeparam name="T">Tipo de entidad que implementa <see cref="IEntity"/>.</typeparam>
     public interface IRepository<T> where T : class, IEntity
     {
-        // --- Métodos de Consulta mediante ISpecification ---
+        /// <summary>
+        /// Obtiene el contexto de base de datos subyacente.
+        /// Permite realizar operaciones directas sobre el contexto de EF Core que no están cubiertas por el repositorio genérico.
+        /// </summary>
+        AutoSalePlaygroundAPIDbContext DbContext { get; }
+
+        #region Métodos de Consulta mediante ISpecification
+
         /// <summary>
         /// Obtiene una lista de entidades que cumplen la especificación.
         /// </summary>
@@ -26,19 +34,28 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Interfaces
         /// <summary>
         /// Proyecta la lista de entidades a un tipo TResult, según la especificación y el selector indicado.
         /// </summary>
-        Task<List<TResult>> ListAsync<TResult>(ISpecification<T> specification, Expression<Func<T, TResult>> selector);
+        Task<List<TResult>> ListAsync<TResult>(
+            ISpecification<T> specification,
+            Expression<Func<T, TResult>> selector);
 
         /// <summary>
         /// Proyecta el primer elemento que cumple la especificación a un tipo TResult o null si no existe.
         /// </summary>
-        Task<TResult?> FirstOrDefaultAsync<TResult>(ISpecification<T> specification, Expression<Func<T, TResult>> selector);
+        Task<TResult?> FirstOrDefaultAsync<TResult>(
+            ISpecification<T> specification,
+            Expression<Func<T, TResult>> selector);
 
         /// <summary>
         /// Retorna una tupla con la lista de entidades y el total de registros (útil para paginación).
         /// </summary>
-        Task<(List<T> Data, int TotalCount)> ListPaginatedAsync(ISpecification<T> specification, CancellationToken cancellationToken = default);
+        Task<(List<T> Data, int TotalCount)> ListPaginatedAsync(
+            ISpecification<T> specification,
+            CancellationToken cancellationToken = default);
 
-        // --- Métodos CRUD ---
+        #endregion
+
+        #region Métodos CRUD
+
         /// <summary>
         /// Agrega una nueva entidad de forma asíncrona.
         /// </summary>
@@ -69,7 +86,10 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Interfaces
         /// </summary>
         Task RemoveRangeAsync(IEnumerable<T> entities);
 
-        // --- Métodos de Consulta y Agregación Avanzados ---
+        #endregion
+
+        #region Métodos de Consulta y Agregación Avanzados
+
         /// <summary>
         /// Verifica si existe al menos un elemento que cumpla el predicado.
         /// </summary>
@@ -160,7 +180,6 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Interfaces
         /// </summary>
         Task<T[]> ToArrayAsync(ISpecification<T> specification);
 
-        // --- Operaciones en Masa (Alias para EF Core 9) ---
         /// <summary>
         /// Ejecuta una operación de borrado masivo para todas las entidades que cumplen el predicado.
         /// </summary>
@@ -169,6 +188,10 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Interfaces
         /// <summary>
         /// Ejecuta una operación de actualización masiva para todas las entidades que cumplen el predicado.
         /// </summary>
-        Task ExecuteUpdateAsync(Expression<Func<T, bool>> predicate, Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> updateExpression);
+        Task ExecuteUpdateAsync(
+            Expression<Func<T, bool>> predicate,
+            Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> updateExpression);
+
+        #endregion
     }
 }
