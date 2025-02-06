@@ -1,12 +1,11 @@
 ﻿using AutoSalePlaygroundAPI.Application.Interfaces;
 using AutoSalePlaygroundAPI.Infrastructure;
 using MediatR;
-using System.Windows.Input;
 
 namespace AutoSalePlaygroundAPI.Application.Behaviors
 {
     public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : ICommand<TResponse>, ICommand
+        where TRequest : ICommand<TResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
 

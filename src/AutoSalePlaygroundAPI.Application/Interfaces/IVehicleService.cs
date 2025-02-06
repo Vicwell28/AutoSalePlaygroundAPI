@@ -47,5 +47,13 @@ namespace AutoSalePlaygroundAPI.Application.Interfaces
         /// Cambia el propietario de un vehículo.
         /// </summary>
         Task ChangeVehicleOwnerAsync(int vehicleId, Owner newOwner);
+
+        /// <summary>
+        /// Agrega accesorios a un vehículo.
+        /// </summary>
+        /// <param name="vehicleId"></param>
+        /// <param name="accessories"></param>
+        /// <returns></returns>
+        Task AddVehicleAccessories(int vehicleId, List<Accessory> accessories);
     }
 }

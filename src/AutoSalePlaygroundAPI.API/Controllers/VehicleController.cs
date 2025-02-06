@@ -146,5 +146,16 @@ namespace AutoSalePlaygroundAPI.API.Controllers
 
             return Ok(response);
         }
+
+        public async Task<IActionResult> AddVehicleAccessories(int vehicleId, [FromBody] List<int> accessoryIds)
+        {
+            var command = new AddVehicleAccessoriesCommand(vehicleId, accessoryIds);
+            var response = await mediator.Send(command);
+            if (!response.IsSuccess)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+            return Ok(response);
+        }
     }
 }

@@ -103,5 +103,23 @@ namespace AutoSalePlaygroundAPI.Application.Services
             vehicle.ChangeOwner(newOwner);
             await _vehicleRepository.UpdateAsync(vehicle);
         }
+
+        public async Task AddVehicleAccessories(int vehicleId, List<int> accessories)
+        {
+            //var vehicle = await GetVehicleByIdAsync(vehicleId);
+            //if (vehicle == null)
+            //{
+            //    throw new Exception("Vehículo no encontrado.");
+            //}
+
+            //var accessorySpec = new GenericAccessorySpec(x => accessories.Contains(x.Id));
+            //var accessories = await _accessoryRepository.ListAsync(accessorySpec);
+
+            //foreach (var accessory in accessories)
+            //{
+            //    vehicle.AddAccessory(accessory);
+            //}
+            //await _vehicleRepository.UpdateAsync(vehicle);
+        }
     }
 }

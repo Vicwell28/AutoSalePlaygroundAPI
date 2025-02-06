@@ -8,6 +8,7 @@ using AutoSalePlaygroundAPI.Infrastructure;
 using AutoSalePlaygroundAPI.Infrastructure.DbContexts;
 using AutoSalePlaygroundAPI.Infrastructure.Interfaces;
 using AutoSalePlaygroundAPI.Infrastructure.Repositories;
+using AutoSalePlaygroundAPI.Infrastructure.Seeders;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -91,6 +92,24 @@ var app = builder.Build();
 //    }
 //}
 // **Fin de la Prueba de Conexión a la Base de Datos**
+
+//if (app.Environment.IsDevelopment())
+//{
+//    using (var scope = app.Services.CreateScope())
+//    {
+//        var services = scope.ServiceProvider;
+//        try
+//        {
+//            var dbContext = services.GetRequiredService<AutoSalePlaygroundAPIDbContext>();
+//            await DbSeeder.SeedAsync(dbContext);
+//        }
+//        catch (Exception ex)
+//        {
+//            var logger = services.GetRequiredService<ILogger<Program>>();
+//            logger.LogError(ex, "Ocurrió un error al sembrar la base de datos");
+//        }
+//    }
+//}
 
 
 // Configurar el middleware de Swagger
