@@ -59,9 +59,9 @@ namespace AutoSalePlaygroundAPI.CrossCutting.Helpers
             return Regex.IsMatch(value, pattern);
         }
 
-        public static bool BeAValidEnum<TEnum>(TEnum value) where TEnum : struct, Enum
+        public static bool BeAValidEnum<TEnum>(TEnum value) where TEnum : struct, System.Enum
         {
-            return Enum.IsDefined(typeof(TEnum), value);
+            return System.Enum.IsDefined(typeof(TEnum), value);
         }
 
         public static bool NotContainForbiddenWords(string value, List<string> forbiddenWords)
