@@ -4,7 +4,7 @@ using AutoSalePlaygroundAPI.Application.Interfaces;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.AddVehicleAccessories
 {
-    public class AddVehicleAccessoriesCommand : ICommand<ResponseDto<VehicleDto>>
+    public class AddVehicleAccessoriesCommand : ICommand<ResponseDto<bool>>
     {
         public int VehicleId { get; set; }
         public List<int> AccessoryIds { get; set; }

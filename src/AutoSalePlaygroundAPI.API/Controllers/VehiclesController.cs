@@ -1,4 +1,5 @@
-﻿using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.CreateVehicle;
+﻿using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.AddVehicleAccessories;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.CreateVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.DeleteVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.UpdateVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle;
@@ -12,11 +13,10 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace AutoSalePlaygroundAPI.API.Controllers
 {
-
     [ApiController]
     [Route("api/[controller]")]
     [SwaggerTag("Controlador para gestionar los Autos")]
-    public class VehicleController(IMediator mediator) : ControllerBase
+    public class VehiclesController(IMediator mediator) : ControllerBase
     {
         /// <summary>
         /// Obtiene la lista completa de autos (vía CQRS).
@@ -147,10 +147,21 @@ namespace AutoSalePlaygroundAPI.API.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Agrega accesorios a un auto.
+        /// </summary>
+        /// <param name="vehicleId"></param>
+        /// <param name="accessoryIds"></param>
+        /// <returns></returns>
+        [HttpPost("{vehicleId}/accessories")]
+        [SwaggerOperation(Summary = "Agrega accesorios a un auto", Description = "Añade accesorios a un auto específico.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Accesorios añadidos exitosamente", typeof(ResponseDto<bool>))]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
         public async Task<IActionResult> AddVehicleAccessories(int vehicleId, [FromBody] List<int> accessoryIds)
         {
             var command = new AddVehicleAccessoriesCommand(vehicleId, accessoryIds);
             var response = await mediator.Send(command);
+
             if (!response.IsSuccess)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, response);

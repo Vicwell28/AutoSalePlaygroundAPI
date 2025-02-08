@@ -12,10 +12,12 @@ namespace AutoSalePlaygroundAPI.Application.Services
     public class VehicleService : IVehicleService
     {
         private readonly IRepository<Vehicle> _vehicleRepository;
+        private readonly IRepository<Accessory> _accessoryRepository;
 
-        public VehicleService(IRepository<Vehicle> vehicleRepository)
+        public VehicleService(IRepository<Vehicle> vehicleRepository, IRepository<Accessory> accessoryRepository)
         {
-            _vehicleRepository = vehicleRepository;
+            _vehicleRepository = vehicleRepository ?? throw new ArgumentNullException(nameof(vehicleRepository));
+            _accessoryRepository = accessoryRepository ?? throw new ArgumentNullException(nameof(accessoryRepository));
         }
 
         /// <summary>
@@ -106,20 +108,21 @@ namespace AutoSalePlaygroundAPI.Application.Services
 
         public async Task AddVehicleAccessories(int vehicleId, List<int> accessories)
         {
-            //var vehicle = await GetVehicleByIdAsync(vehicleId);
-            //if (vehicle == null)
-            //{
-            //    throw new Exception("Vehículo no encontrado.");
-            //}
+            var vehicle = await GetVehicleByIdAsync(vehicleId);
+            if (vehicle == null)
+            {
+                throw new Exception("Vehículo no encontrado.");
+            }
 
-            //var accessorySpec = new GenericAccessorySpec(x => accessories.Contains(x.Id));
-            //var accessories = await _accessoryRepository.ListAsync(accessorySpec);
+            var accessorySpec = new GenericAccessorySpec(x => accessories.Contains(x.Id));
+            var accesoryEntityes = await _accessoryRepository.ListAsync(accessorySpec);
 
-            //foreach (var accessory in accessories)
-            //{
-            //    vehicle.AddAccessory(accessory);
-            //}
-            //await _vehicleRepository.UpdateAsync(vehicle);
+            foreach (var accessory in accesoryEntityes)
+            {
+                vehicle.AddAccessory(accessory);
+            }
+
+            await _vehicleRepository.UpdateAsync(vehicle);
         }
     }
 }

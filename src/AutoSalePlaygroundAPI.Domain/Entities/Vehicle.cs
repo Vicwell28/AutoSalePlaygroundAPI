@@ -61,6 +61,15 @@ namespace AutoSalePlaygroundAPI.Domain.Entities
             DomainEvents.Raise(new VehicleAccessoryAddedDomainEvent(this.Id, accessory.Id));
         }
 
+        public void AddAccessories(List<Accessory> accessories)
+        {
+            Guard.Against.Null(accessories, nameof(accessories), "La lista de accesorios no puede ser nula.");
+            foreach (var accessory in accessories)
+            {
+                AddAccessory(accessory);
+            }
+        }
+
         public void UpdateSpecifications(string fuelType, int engineDisplacement, int horsepower)
         {
             Guard.Against.NullOrWhiteSpace(fuelType, nameof(fuelType), "El tipo de combustible no puede ser nulo o vacío.");

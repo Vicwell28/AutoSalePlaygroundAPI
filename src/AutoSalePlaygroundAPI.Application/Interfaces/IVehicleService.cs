@@ -54,6 +54,6 @@ namespace AutoSalePlaygroundAPI.Application.Interfaces
         /// <param name="vehicleId"></param>
         /// <param name="accessories"></param>
         /// <returns></returns>
-        Task AddVehicleAccessories(int vehicleId, List<Accessory> accessories);
+        Task AddVehicleAccessories(int vehicleId, List<int> accessories);
     }
 }
