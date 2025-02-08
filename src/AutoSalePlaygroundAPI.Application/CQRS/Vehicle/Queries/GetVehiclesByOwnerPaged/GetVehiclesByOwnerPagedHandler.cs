@@ -16,12 +16,12 @@ namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetActiveVehicl
             IMapper mapper)
         {
             _vehicleService = vehicleService ?? throw new ArgumentNullException(nameof(vehicleService));
-            _mapper = mapper;
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public async Task<PaginatedResponseDto<VehicleDto>> Handle(GetActiveVehiclesByOwnerPagedQuery request, CancellationToken cancellationToken)
         {
-            var (vehicles, totalCount) = await _vehicleService.GetActiveVehiclesByOwnerPagedAsync(request.OwnerId, request.PageNumber, request.PageSize);
+            var (vehicles, totalCount) = await _vehicleService.GetActiveVehiclesByOwnerPagedAsync(request.OwnerId, request.PageNumber, request.PageSize, request.VehicleSortByEnum, request.OrderByEnum);
 
             var vehicleDtos = _mapper.Map<List<VehicleDto>>(vehicles);
 

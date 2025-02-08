@@ -1,4 +1,5 @@
-﻿using AutoSalePlaygroundAPI.Domain.Entities;
+﻿using AutoSalePlaygroundAPI.CrossCutting.Enum;
+using AutoSalePlaygroundAPI.Domain.Entities;
 using AutoSalePlaygroundAPI.Domain.ValueObjects;
 
 namespace AutoSalePlaygroundAPI.Application.Interfaces
@@ -31,7 +32,12 @@ namespace AutoSalePlaygroundAPI.Application.Interfaces
         /// <summary>
         /// Obtiene vehículos activos de un propietario de forma paginada.
         /// </summary>
-        Task<(List<Vehicle> Vehicles, int TotalCount)> GetActiveVehiclesByOwnerPagedAsync(int ownerId, int pageNumber, int pageSize);
+        Task<(List<Vehicle> Vehicles, int TotalCount)> GetActiveVehiclesByOwnerPagedAsync(
+            int ownerId, 
+            int pageNumber, 
+            int pageSize, 
+            VehicleSortByEnum vehicleSortByEnum,
+            OrderByEnum orderByEnum);
 
         /// <summary>
         /// Agrega un nuevo vehículo.

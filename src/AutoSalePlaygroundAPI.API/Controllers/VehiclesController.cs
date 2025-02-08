@@ -2,11 +2,13 @@
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.CreateVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.DeleteVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.UpdateVehicle;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetActiveVehiclesByOwnerPaged;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehicleById;
 using AutoSalePlaygroundAPI.Application.DTOs;
 using AutoSalePlaygroundAPI.Application.DTOs.Response;
 using AutoSalePlaygroundAPI.CrossCutting.Constants;
+using AutoSalePlaygroundAPI.CrossCutting.Enum;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -141,6 +143,37 @@ namespace AutoSalePlaygroundAPI.API.Controllers
                 if (response.Code == ResponseCodes.NotFound)
                     return NotFound(response);
 
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Obtiene la lista de vehículos activos asociados a un propietario de forma paginada (vía CQRS).
+        /// </summary>
+        /// <param name="ownerId"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="vehicleSortByEnum"></param>
+        /// <param name="orderByEnum"></param>
+        /// <returns></returns>
+        [HttpGet("owner/{ownerId}")]
+        [SwaggerOperation(Summary = "Obtiene los autos activos de un propietario de forma paginada", Description = "Devuelve una lista paginada de autos activos asociados a un propietario.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Lista de autos obtenida exitosamente", typeof(PaginatedResponseDto<VehicleDto>))]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
+        public async Task<IActionResult> GetActiveVehiclesByOwnerPagedAsync(
+            int ownerId,
+            int pageNumber,
+            int pageSize,
+            VehicleSortByEnum vehicleSortByEnum,
+            OrderByEnum orderByEnum)
+        {
+            var query = new GetActiveVehiclesByOwnerPagedQuery(ownerId, pageNumber, pageSize, vehicleSortByEnum, orderByEnum);
+            var response = await mediator.Send(query);
+
+            if (!response.IsSuccess)
+            {
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
 

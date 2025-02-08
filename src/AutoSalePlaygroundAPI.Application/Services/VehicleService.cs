@@ -1,4 +1,5 @@
 ﻿using AutoSalePlaygroundAPI.Application.Interfaces;
+using AutoSalePlaygroundAPI.CrossCutting.Enum;
 using AutoSalePlaygroundAPI.Domain.Entities;
 using AutoSalePlaygroundAPI.Domain.Specifications;
 using AutoSalePlaygroundAPI.Infrastructure.Interfaces;
@@ -62,9 +63,14 @@ namespace AutoSalePlaygroundAPI.Application.Services
         /// <summary>
         /// Obtiene vehículos activos de un propietario de forma paginada.
         /// </summary>
-        public async Task<(List<Vehicle> Vehicles, int TotalCount)> GetActiveVehiclesByOwnerPagedAsync(int ownerId, int pageNumber, int pageSize)
+        public async Task<(List<Vehicle> Vehicles, int TotalCount)> GetActiveVehiclesByOwnerPagedAsync(
+            int ownerId,
+            int pageNumber,
+            int pageSize,
+            VehicleSortByEnum vehicleSortByEnum,
+            OrderByEnum orderByEnum)
         {
-            var spec = new VehicleActiveByOwnerPagedSpec(ownerId, pageNumber, pageSize);
+            var spec = new VehicleActiveByOwnerPagedSpec(ownerId, pageNumber, pageSize, vehicleSortByEnum, orderByEnum);
             return await _vehicleRepository.ListPaginatedAsync(spec);
         }
 

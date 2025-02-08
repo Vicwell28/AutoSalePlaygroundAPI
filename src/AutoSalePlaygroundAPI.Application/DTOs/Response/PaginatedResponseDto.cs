@@ -29,7 +29,7 @@
             return response;
         }
 
-        public static PaginatedResponseDto<T> Error(string message, List<string> errors, string? code = null)
+        public new static PaginatedResponseDto<T> Error(string message, List<string> errors, string? code = null)
         {
             var response = new PaginatedResponseDto<T>();
             response.SetError(message, errors, code);
