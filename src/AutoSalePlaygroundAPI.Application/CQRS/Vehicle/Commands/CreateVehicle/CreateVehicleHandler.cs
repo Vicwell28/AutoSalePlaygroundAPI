@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using AutoSalePlaygroundAPI.Application.DTOs;
-using AutoSalePlaygroundAPI.Application.DTOs.Response;
+using AutoSalePlaygroundAPI.Domain.DTOs;
+using AutoSalePlaygroundAPI.Domain.DTOs.Response;
 using AutoSalePlaygroundAPI.Application.Interfaces;
 using AutoSalePlaygroundAPI.Domain.ValueObjects;
 using MediatR;

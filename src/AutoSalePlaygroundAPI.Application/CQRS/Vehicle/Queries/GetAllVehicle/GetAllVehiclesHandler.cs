@@ -1,36 +1,35 @@
-﻿using AutoSalePlaygroundAPI.Application.DTOs;
-using AutoSalePlaygroundAPI.Application.DTOs.Response;
+﻿using AutoMapper;
+using AutoSalePlaygroundAPI.Domain.DTOs;
+using AutoSalePlaygroundAPI.Domain.DTOs.Response;
+using AutoSalePlaygroundAPI.Infrastructure.Interfaces;
 using MediatR;
+using System.Data.Entity;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle
 {
     public class GetAllVehiclesHandler : IRequestHandler<GetAllVehiclesQuery, ResponseDto<List<VehicleDto>>>
     {
-        public Task<ResponseDto<List<VehicleDto>>> Handle(GetAllVehiclesQuery request, CancellationToken cancellationToken)
+        private readonly IRepository<Domain.Entities.Vehicle> _vehicleRepository;
+        private readonly IMapper _mapper;
+
+        public GetAllVehiclesHandler(IRepository<Domain.Entities.Vehicle> vehicleRepository, IMapper mapper)
         {
-            var vehicles = new List<VehicleDto>
+            _vehicleRepository = vehicleRepository ?? throw new ArgumentNullException(nameof(vehicleRepository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        }
+
+        public async Task<ResponseDto<List<VehicleDto>>> Handle(GetAllVehiclesQuery request, CancellationToken cancellationToken)
+        {
+            var vehicles = await _vehicleRepository.DbContext.Vehicles.ToListAsync();
+
+            if (vehicles == null)
             {
-                new VehicleDto
-                {
-                    Id = 123,
-                    Marca = "Toyota",
-                    Modelo = "Corolla",
-                    Año = 2021,
-                    Precio = 25000
-                },
-                new VehicleDto
-                {
-                    Id = 124,
-                    Marca = "Toyota",
-                    Modelo = "Yaris",
-                    Año = 2021,
-                    Precio = 20000
-                }
-            };
+                throw new InvalidDataException("No se encontraron vehículos");
+            }
 
-            var response = ResponseDto<List<VehicleDto>>.Success(vehicles, "Vehículos obtenidos con éxito");
+            var vehicleDtos = _mapper.Map<List<VehicleDto>>(vehicles);
 
-            return Task.FromResult(response);
+            return ResponseDto<List<VehicleDto>>.Success(vehicleDtos, "Vehículos obtenidos con éxito"); ;
         }
     }
 }

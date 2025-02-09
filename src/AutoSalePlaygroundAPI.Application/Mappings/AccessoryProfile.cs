@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using AutoSalePlaygroundAPI.Application.DTOs;
+using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.Entities;
 
 namespace AutoSalePlaygroundAPI.Application.Mappings

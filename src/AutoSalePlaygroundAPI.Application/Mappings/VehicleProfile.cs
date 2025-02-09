@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using AutoSalePlaygroundAPI.Application.DTOs;
+using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.Entities;
 
 namespace AutoSalePlaygroundAPI.Application.Mappings
@@ -8,8 +8,6 @@ namespace AutoSalePlaygroundAPI.Application.Mappings
     {
         public VehicleProfile()
         {
-            // Mapeo de una supuesta entidad Vehicle -> VehicleDto
-            // y viceversa
             CreateMap<Vehicle, VehicleDto>().ReverseMap();
         }
     }

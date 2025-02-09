@@ -1,4 +1,4 @@
-﻿using AutoSalePlaygroundAPI.Application.DTOs.Response;
+﻿using AutoSalePlaygroundAPI.Domain.DTOs.Response;
 using AutoSalePlaygroundAPI.Application.Interfaces;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Accessory.Commands.DeleteAccessory

@@ -54,7 +54,16 @@ namespace AutoSalePlaygroundAPI.Domain.Specifications.Base
         /// </summary>
         public void AddOrderBy<TKey>(Expression<Func<T, TKey>> keySelector)
         {
-            OrderExpressions.Add(query => query.OrderBy(keySelector));
+            if (!OrderExpressions.Any())
+            {
+                // Primer criterio: usamos OrderBy
+                OrderExpressions.Add(query => query.OrderBy(keySelector));
+            }
+            else
+            {
+                // Si ya existe ordenamiento, encadenamos con ThenBy
+                OrderExpressions.Add(query => ((IOrderedQueryable<T>)query).ThenBy(keySelector));
+            }
         }
 
         /// <summary>
@@ -62,7 +71,14 @@ namespace AutoSalePlaygroundAPI.Domain.Specifications.Base
         /// </summary>
         public void AddOrderByDescending<TKey>(Expression<Func<T, TKey>> keySelector)
         {
-            OrderExpressions.Add(query => query.OrderByDescending(keySelector));
+            if (!OrderExpressions.Any())
+            {
+                OrderExpressions.Add(query => query.OrderByDescending(keySelector));
+            }
+            else
+            {
+                OrderExpressions.Add(query => ((IOrderedQueryable<T>)query).ThenByDescending(keySelector));
+            }
         }
 
         /// <summary>

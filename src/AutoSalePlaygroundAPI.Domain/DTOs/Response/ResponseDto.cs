@@ -1,4 +1,4 @@
-﻿namespace AutoSalePlaygroundAPI.Application.DTOs.Response
+﻿namespace AutoSalePlaygroundAPI.Domain.DTOs.Response
 {
     public class ResponseDto<T> : BaseResponseDto
     {

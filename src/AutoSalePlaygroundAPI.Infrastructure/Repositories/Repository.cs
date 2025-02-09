@@ -244,10 +244,19 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Repositories
             }
 
             // 3) Aplicar ordenamientos
-            foreach (var orderExpression in specification.OrderExpressions)
+            if (specification.OrderExpressions.Any())
             {
-                inputQuery = orderExpression(inputQuery);
+                // Aplicamos el primer criterio
+                var orderedQuery = specification.OrderExpressions.First()(inputQuery);
+
+                // Encadenamos los siguientes criterios
+                foreach (var orderExpression in specification.OrderExpressions.Skip(1))
+                {
+                    orderedQuery = orderExpression(orderedQuery);
+                }
+                inputQuery = orderedQuery;
             }
+
 
             // 4) Aplicar paginación (si no se ignora)
             if (!ignorePaging && specification.IsPagingEnabled)

@@ -5,8 +5,8 @@ using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.UpdateVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetActiveVehiclesByOwnerPaged;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehicleById;
-using AutoSalePlaygroundAPI.Application.DTOs;
-using AutoSalePlaygroundAPI.Application.DTOs.Response;
+using AutoSalePlaygroundAPI.Domain.DTOs;
+using AutoSalePlaygroundAPI.Domain.DTOs.Response;
 using AutoSalePlaygroundAPI.CrossCutting.Constants;
 using AutoSalePlaygroundAPI.CrossCutting.Enum;
 using MediatR;
@@ -81,7 +81,7 @@ namespace AutoSalePlaygroundAPI.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var command = new CreateVehicleCommand(autoDto.LicensePlateNumber, autoDto.OwnerId, autoDto.FuelType, autoDto.EngineDisplacement, autoDto.Horsepower);
+            var command = new CreateVehicleCommand(autoDto.LicensePlateNumber, autoDto.OwnerId, autoDto.Specifications.FuelType, autoDto.Specifications.EngineDisplacement, autoDto.Specifications.Horsepower);
             var response = await mediator.Send(command);
 
             if (!response.IsSuccess)
@@ -110,7 +110,7 @@ namespace AutoSalePlaygroundAPI.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var command = new UpdateVehicleCommand(id, autoDto.Marca, autoDto.Modelo, autoDto.Año, autoDto.Precio);
+            var command = new UpdateVehicleCommand(id, autoDto.Specifications.FuelType, autoDto.Specifications.EngineDisplacement, autoDto.Specifications.Horsepower);
             var response = await mediator.Send(command);
 
             if (!response.IsSuccess)

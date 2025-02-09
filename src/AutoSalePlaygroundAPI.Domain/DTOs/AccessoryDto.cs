@@ -1,4 +1,4 @@
-﻿namespace AutoSalePlaygroundAPI.Application.DTOs
+﻿namespace AutoSalePlaygroundAPI.Domain.DTOs
 {
     public class AccessoryDto
     {
