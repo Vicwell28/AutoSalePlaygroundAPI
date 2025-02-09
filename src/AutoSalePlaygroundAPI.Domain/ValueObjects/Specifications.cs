@@ -22,5 +22,23 @@ namespace AutoSalePlaygroundAPI.Domain.ValueObjects
             EngineDisplacement = engineDisplacement;
             Horsepower = horsepower;
         }
+
+        public void UpdateFuelType(string newFuelType)
+        {
+            Guard.Against.NullOrWhiteSpace(newFuelType, nameof(newFuelType), "El nuevo tipo de combustible no puede ser nulo o vacío.");
+            FuelType = newFuelType;
+        }
+
+        public void UpdateEngineDisplacement(int newEngineDisplacement)
+        {
+            Guard.Against.NegativeOrZero(newEngineDisplacement, nameof(newEngineDisplacement), "La nueva cilindrada del motor debe ser mayor que cero.");
+            EngineDisplacement = newEngineDisplacement;
+        }
+
+        public void UpdateHorsepower(int newHorsepower)
+        {
+            Guard.Against.NegativeOrZero(newHorsepower, nameof(newHorsepower), "La nueva potencia del motor debe ser mayor que cero.");
+            Horsepower = newHorsepower;
+        }
     }
 }

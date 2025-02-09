@@ -86,5 +86,41 @@ namespace AutoSalePlaygroundAPI.Domain.Entities
                 oldSpecs.FuelType, oldSpecs.EngineDisplacement, oldSpecs.Horsepower,
                 fuelType, engineDisplacement, horsepower));
         }
+
+        public void UpdateFuelType(string newFuelType)
+        {
+            Guard.Against.NullOrWhiteSpace(newFuelType, nameof(newFuelType), "El nuevo tipo de combustible no puede ser nulo o vacío.");
+            
+            var oldFuelType = this.Specifications.FuelType;
+            Specifications.UpdateFuelType(newFuelType);
+            
+            MarkUpdated();
+            // Raise a domain event
+            //DomainEvents.Raise(new VehicleFuelTypeUpdatedDomainEvent(this.Id, oldFuelType, newFuelType));
+        }
+
+        public void UpdateEngineDisplacement(int newEngineDisplacement)
+        {
+            Guard.Against.NegativeOrZero(newEngineDisplacement, nameof(newEngineDisplacement), "La nueva cilindrada del motor debe ser mayor que cero.");
+
+            var oldEngineDisplacement = this.Specifications.EngineDisplacement;
+            Specifications.UpdateEngineDisplacement(newEngineDisplacement);
+
+            MarkUpdated();
+            // Raise a domain event
+            //DomainEvents.Raise(new VehicleEngineDisplacementUpdatedDomainEvent(this.Id, oldEngineDisplacement, newEngineDisplacement));
+        }
+
+        public void UpdateHorsepower(int newHorsepower)
+        {
+            Guard.Against.NegativeOrZero(newHorsepower, nameof(newHorsepower), "La nueva potencia del motor debe ser mayor que cero.");
+            
+            var oldHorsepower = this.Specifications.Horsepower;
+            Specifications.UpdateHorsepower(newHorsepower);
+            
+            MarkUpdated();
+            // Raise a domain event
+            //DomainEvents.Raise(new VehicleHorsepowerUpdatedDomainEvent(this.Id, oldHorsepower, newHorsepower));
+        }
     }
 }
