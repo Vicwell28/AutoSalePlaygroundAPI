@@ -8,6 +8,7 @@ using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.UpdateVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetActiveVehiclesByOwnerPaged;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehicleById;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehiclesDynamic;
 using AutoSalePlaygroundAPI.CrossCutting.Enum;
 using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.DTOs.Response;
@@ -203,6 +204,26 @@ namespace AutoSalePlaygroundAPI.API.Controllers
                 Horsepower);
 
             var response = await Mediator.Send(command);
+            return ProcessResponse(response);
+        }
+
+        /// <summary>
+        /// Obtiene vehículos de forma dinámica, con paginación y criterios de ordenamiento (vía CQRS).
+        /// </summary>
+        /// <param name="pageNumber">Número de página.</param>
+        /// <param name="pageSize">Cantidad de registros por página.</param>
+        /// <param name="sortCriteria">Criterios de ordenamiento.</param>
+        [HttpGet("dynamic")]
+        [SwaggerOperation(Summary = "Obtiene vehículos de forma dinámica", Description = "Devuelve una lista paginada de vehículos según criterios dinámicos de ordenamiento.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Vehículos obtenidos exitosamente", typeof(PaginatedResponseDto<VehicleDto>))]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
+        public async Task<IActionResult> GetVehiclesDynamic(
+            [FromQuery] int pageNumber,
+            [FromQuery] int pageSize,
+            [FromQuery] List<SortCriteriaDto> sortCriteria)
+        {
+            var query = new GetVehiclesDynamicQuery(pageNumber, pageSize, sortCriteria);
+            var response = await Mediator.Send(query);
             return ProcessResponse(response);
         }
     }

@@ -1,5 +1,6 @@
 ﻿using AutoSalePlaygroundAPI.Application.Interfaces;
 using AutoSalePlaygroundAPI.CrossCutting.Enum;
+using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.Entities;
 using AutoSalePlaygroundAPI.Domain.Specifications;
 using AutoSalePlaygroundAPI.Domain.ValueObjects;
@@ -157,84 +158,88 @@ namespace AutoSalePlaygroundAPI.Application.Services
         /// <inheritdoc />
         public Task PartialVehicleUpdateAsync(Vehicle vehicle)
         {
-            // Adjunta la entidad al contexto para que EF Core la rastree.
             _vehicleRepository.DbContext.Attach(vehicle);
             var vehicleEntry = _vehicleRepository.DbContext.Entry(vehicle);
 
-
-            // Actualiza la placa si se ha proporcionado un nuevo valor.
-            if (vehicle.LicensePlateNumber != null)
+            if (!string.IsNullOrEmpty(vehicle.LicensePlateNumber))
             {
                 vehicle.UpdateLicensePlate(vehicle.LicensePlateNumber);
-                _vehicleRepository.DbContext.Entry(vehicle)
-                    .Property(p => p.LicensePlateNumber).IsModified = true;
+                vehicleEntry.Property(v => v.LicensePlateNumber).IsModified = true;
             }
 
-            // Actualiza el tipo de combustible si se ha proporcionado un valor.
-            // Actualiza la cilindrada si el valor es distinto de cero
-            // Actualiza la potencia si el valor es distinto de cero
-            if (vehicle.Specifications.FuelType != null && vehicle.Specifications.EngineDisplacement != 0 && vehicle.Specifications.Horsepower != 0)
+            var specsEntry = vehicleEntry.Reference(v => v.Specifications).TargetEntry;
+            if (specsEntry != null)
             {
-                vehicle.UpdateFuelType(vehicle.Specifications.FuelType);
-                vehicle.UpdateEngineDisplacement(vehicle.Specifications.EngineDisplacement);
-                vehicle.UpdateHorsepower(vehicle.Specifications.Horsepower);
-
-                // Para la propiedad FuelType:
-                vehicleEntry.Reference(v => v.Specifications).TargetEntry
-                    .Property(s => s.FuelType).IsModified = true;
-
-                // Para la propiedad EngineDisplacement:
-                vehicleEntry.Reference(v => v.Specifications).TargetEntry
-                    .Property(s => s.EngineDisplacement).IsModified = true;
-
-                // Para la propiedad Horsepower:
-                vehicleEntry.Reference(v => v.Specifications).TargetEntry
-                    .Property(s => s.Horsepower).IsModified = true;
-            }
-
-            // La persistencia (SaveChanges) se gestiona de forma centralizada (por ejemplo, mediante Unit of Work).
-            return Task.CompletedTask;
-        }
-
-        /// <inheritdoc />
-        public Task PartialVehiclesBulkUpdateAsync(IEnumerable<Vehicle> vehicles)
-        {
-            // Itera sobre cada vehículo de la colección para actualizar de forma parcial.
-            foreach (var vehicle in vehicles)
-            {
-                _vehicleRepository.DbContext.Attach(vehicle);
-
-                if (vehicle.LicensePlateNumber != null)
-                {
-                    vehicle.UpdateLicensePlate(vehicle.LicensePlateNumber);
-                    _vehicleRepository.DbContext.Entry(vehicle)
-                        .Property(p => p.LicensePlateNumber).IsModified = true;
-                }
-
-                if (vehicle.Specifications.FuelType != null)
+                if (!string.IsNullOrEmpty(vehicle.Specifications.FuelType))
                 {
                     vehicle.UpdateFuelType(vehicle.Specifications.FuelType);
-                    _vehicleRepository.DbContext.Entry(vehicle)
-                        .Property(p => p.Specifications.FuelType).IsModified = true;
+                    specsEntry.Property(s => s.FuelType).IsModified = true;
                 }
 
                 if (vehicle.Specifications.EngineDisplacement != 0)
                 {
                     vehicle.UpdateEngineDisplacement(vehicle.Specifications.EngineDisplacement);
-                    _vehicleRepository.DbContext.Entry(vehicle)
-                        .Property(p => p.Specifications.EngineDisplacement).IsModified = true;
+                    specsEntry.Property(s => s.EngineDisplacement).IsModified = true;
                 }
 
                 if (vehicle.Specifications.Horsepower != 0)
                 {
                     vehicle.UpdateHorsepower(vehicle.Specifications.Horsepower);
-                    _vehicleRepository.DbContext.Entry(vehicle)
-                        .Property(p => p.Specifications.Horsepower).IsModified = true;
+                    specsEntry.Property(s => s.Horsepower).IsModified = true;
                 }
             }
 
-            // La persistencia de los cambios se realiza externamente en una única transacción.
+            // La persistencia (SaveChanges) se gestiona de forma centralizada en el pipeline.
             return Task.CompletedTask;
+        }
+
+
+        /// <inheritdoc />
+        public Task PartialVehiclesBulkUpdateAsync(IEnumerable<Vehicle> vehicles)
+        {
+            foreach (var vehicle in vehicles)
+            {
+                _vehicleRepository.DbContext.Attach(vehicle);
+                var vehicleEntry = _vehicleRepository.DbContext.Entry(vehicle);
+
+                if (!string.IsNullOrEmpty(vehicle.LicensePlateNumber))
+                {
+                    vehicle.UpdateLicensePlate(vehicle.LicensePlateNumber);
+                    vehicleEntry.Property(v => v.LicensePlateNumber).IsModified = true;
+                }
+
+                var specsEntry = vehicleEntry.Reference(v => v.Specifications).TargetEntry;
+                if (specsEntry != null)
+                {
+                    if (!string.IsNullOrEmpty(vehicle.Specifications.FuelType))
+                    {
+                        vehicle.UpdateFuelType(vehicle.Specifications.FuelType);
+                        specsEntry.Property(s => s.FuelType).IsModified = true;
+                    }
+
+                    if (vehicle.Specifications.EngineDisplacement != 0)
+                    {
+                        vehicle.UpdateEngineDisplacement(vehicle.Specifications.EngineDisplacement);
+                        specsEntry.Property(s => s.EngineDisplacement).IsModified = true;
+                    }
+
+                    if (vehicle.Specifications.Horsepower != 0)
+                    {
+                        vehicle.UpdateHorsepower(vehicle.Specifications.Horsepower);
+                        specsEntry.Property(s => s.Horsepower).IsModified = true;
+                    }
+                }
+            }
+
+            // La persistencia (SaveChanges) se gestiona de forma centralizada en el pipeline.
+            return Task.CompletedTask;
+        }
+
+        /// <inheritdoc />
+        public async Task<(List<Vehicle> Vehicles, int TotalCount)> VehicleDynamicSort(List<SortCriteriaDto> sortCriteria, int pageNumber, int pageSize)
+        {
+            var spec = new VehicleDynamicSortSpec(sortCriteria, pageNumber, pageSize);
+            return await _vehicleRepository.ListPaginatedAsync(spec);
         }
     }
 }

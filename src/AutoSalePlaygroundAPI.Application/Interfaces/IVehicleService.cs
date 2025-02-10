@@ -1,4 +1,5 @@
 ﻿using AutoSalePlaygroundAPI.CrossCutting.Enum;
+using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.Entities;
 using AutoSalePlaygroundAPI.Domain.ValueObjects;
 
@@ -126,5 +127,14 @@ namespace AutoSalePlaygroundAPI.Application.Interfaces
         /// </summary>
         /// <param name="vehicles">Colección de vehículos a actualizar parcialmente.</param>
         Task PartialVehiclesBulkUpdateAsync(IEnumerable<Vehicle> vehicles);
+
+        /// <summary>
+        /// Obtiene la lista de vehículos de forma paginada, ordenada y filtrada.
+        /// </summary>
+        /// <param name="sortCriteria"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        Task<(List<Vehicle> Vehicles, int TotalCount)> VehicleDynamicSort(List<SortCriteriaDto> sortCriteria, int pageNumber, int pageSize);
     }
 }
