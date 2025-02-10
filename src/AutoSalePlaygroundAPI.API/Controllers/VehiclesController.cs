@@ -9,9 +9,9 @@ using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetActiveVehiclesBy
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehicleById;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehiclesDynamic;
-using AutoSalePlaygroundAPI.CrossCutting.Enum;
 using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.DTOs.Response;
+using AutoSalePlaygroundAPI.Domain.Enum;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;

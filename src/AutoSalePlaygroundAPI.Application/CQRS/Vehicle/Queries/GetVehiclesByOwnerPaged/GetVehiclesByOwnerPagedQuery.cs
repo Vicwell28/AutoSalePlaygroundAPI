@@ -1,7 +1,7 @@
 ﻿using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.DTOs.Response;
 using AutoSalePlaygroundAPI.Application.Interfaces;
-using AutoSalePlaygroundAPI.CrossCutting.Enum;
+using AutoSalePlaygroundAPI.Domain.Enum;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetActiveVehiclesByOwnerPaged
 {

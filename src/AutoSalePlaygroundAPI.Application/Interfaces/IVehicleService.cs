@@ -1,6 +1,6 @@
-﻿using AutoSalePlaygroundAPI.CrossCutting.Enum;
-using AutoSalePlaygroundAPI.Domain.DTOs;
+﻿using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.Entities;
+using AutoSalePlaygroundAPI.Domain.Enum;
 using AutoSalePlaygroundAPI.Domain.ValueObjects;
 
 namespace AutoSalePlaygroundAPI.Application.Interfaces

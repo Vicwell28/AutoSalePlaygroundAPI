@@ -1,7 +1,7 @@
 ﻿using AutoSalePlaygroundAPI.Application.Interfaces;
-using AutoSalePlaygroundAPI.CrossCutting.Enum;
 using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.Entities;
+using AutoSalePlaygroundAPI.Domain.Enum;
 using AutoSalePlaygroundAPI.Domain.Specifications;
 using AutoSalePlaygroundAPI.Domain.ValueObjects;
 using AutoSalePlaygroundAPI.Infrastructure.Interfaces;

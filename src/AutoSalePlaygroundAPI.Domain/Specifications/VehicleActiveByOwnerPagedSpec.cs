@@ -1,5 +1,5 @@
-﻿using AutoSalePlaygroundAPI.CrossCutting.Enum;
-using AutoSalePlaygroundAPI.Domain.Entities;
+﻿using AutoSalePlaygroundAPI.Domain.Entities;
+using AutoSalePlaygroundAPI.Domain.Enum;
 using AutoSalePlaygroundAPI.Domain.Specifications.Base;
 using AutoSalePlaygroundAPI.Domain.Specifications.Filters;
 using Microsoft.EntityFrameworkCore;
