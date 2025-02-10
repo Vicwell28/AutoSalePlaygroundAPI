@@ -4,6 +4,7 @@ using AutoSalePlaygroundAPI.Domain.Entities;
 using AutoSalePlaygroundAPI.Domain.Specifications;
 using AutoSalePlaygroundAPI.Domain.ValueObjects;
 using AutoSalePlaygroundAPI.Infrastructure.Interfaces;
+using System.Text.Json;
 
 namespace AutoSalePlaygroundAPI.Application.Services
 {
@@ -162,6 +163,8 @@ namespace AutoSalePlaygroundAPI.Application.Services
         {
             // Adjunta la entidad al contexto para que EF Core la rastree.
             _vehicleRepository.DbContext.Attach(vehicle);
+            var vehicleEntry = _vehicleRepository.DbContext.Entry(vehicle);
+
 
             // Actualiza la placa si se ha proporcionado un nuevo valor.
             if (vehicle.LicensePlateNumber != null)
@@ -172,27 +175,25 @@ namespace AutoSalePlaygroundAPI.Application.Services
             }
 
             // Actualiza el tipo de combustible si se ha proporcionado un valor.
-            if (vehicle.Specifications.FuelType != null)
+            // Actualiza la cilindrada si el valor es distinto de cero
+            // Actualiza la potencia si el valor es distinto de cero
+            if (vehicle.Specifications.FuelType != null && vehicle.Specifications.EngineDisplacement != 0 && vehicle.Specifications.Horsepower != 0)
             {
                 vehicle.UpdateFuelType(vehicle.Specifications.FuelType);
-                _vehicleRepository.DbContext.Entry(vehicle)
-                    .Property(p => p.Specifications.FuelType).IsModified = true;
-            }
-
-            // Actualiza la cilindrada si el valor es distinto de cero.
-            if (vehicle.Specifications.EngineDisplacement != 0)
-            {
                 vehicle.UpdateEngineDisplacement(vehicle.Specifications.EngineDisplacement);
-                _vehicleRepository.DbContext.Entry(vehicle)
-                    .Property(p => p.Specifications.EngineDisplacement).IsModified = true;
-            }
-
-            // Actualiza la potencia si el valor es distinto de cero.
-            if (vehicle.Specifications.Horsepower != 0)
-            {
                 vehicle.UpdateHorsepower(vehicle.Specifications.Horsepower);
-                _vehicleRepository.DbContext.Entry(vehicle)
-                    .Property(p => p.Specifications.Horsepower).IsModified = true;
+
+                // Para la propiedad FuelType:
+                vehicleEntry.Reference(v => v.Specifications).TargetEntry
+                    .Property(s => s.FuelType).IsModified = true;
+
+                // Para la propiedad EngineDisplacement:
+                vehicleEntry.Reference(v => v.Specifications).TargetEntry
+                    .Property(s => s.EngineDisplacement).IsModified = true;
+
+                // Para la propiedad Horsepower:
+                vehicleEntry.Reference(v => v.Specifications).TargetEntry
+                    .Property(s => s.Horsepower).IsModified = true;
             }
 
             // La persistencia (SaveChanges) se gestiona de forma centralizada (por ejemplo, mediante Unit of Work).

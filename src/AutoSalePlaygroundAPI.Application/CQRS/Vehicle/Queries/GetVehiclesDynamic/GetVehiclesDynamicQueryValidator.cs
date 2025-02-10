@@ -2,7 +2,7 @@
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehiclesDynamic
 {
-    public class GetVehiclesDynamicQueryValidator : FluentValidation.AbstractValidator<GetVehiclesDynamicQuery>
+    public class GetVehiclesDynamicQueryValidator : AbstractValidator<GetVehiclesDynamicQuery>
     {
         public GetVehiclesDynamicQueryValidator()
         {

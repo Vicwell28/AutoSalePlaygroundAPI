@@ -5,13 +5,20 @@ namespace AutoSalePlaygroundAPI.Domain.Entities
 {
     public class Vehicle : BaseEntity
     {
-        public string LicensePlateNumber { get; private set; } = null!;
-        public int OwnerId { get; private set; }
-        public virtual Owner Owner { get; private set; } = null!;
-        public ValueObjects.Specifications Specifications { get; private set; } = null!;
-        public virtual ICollection<Accessory> Accessories { get; private set; } = new List<Accessory>();
+        public string LicensePlateNumber { get; protected set; } = null!;
+        public int OwnerId { get; protected set; }
+        public virtual Owner Owner { get; protected set; } = null!;
+        public ValueObjects.Specifications Specifications { get; set; } = null!;
+        public virtual ICollection<Accessory> Accessories { get; protected set; } = new List<Accessory>();
 
         protected Vehicle() { }
+
+        public Vehicle(int id, string licensePlateNumber, Domain.ValueObjects.Specifications specifications)
+        {
+            Id = id;
+            LicensePlateNumber = licensePlateNumber;
+            Specifications = specifications;
+        }
 
         public Vehicle(string licensePlateNumber, Owner owner, ValueObjects.Specifications specifications)
         {

@@ -12,6 +12,9 @@ using AutoSalePlaygroundAPI.CrossCutting.Enum;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.BulkUpdateVehicles;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.ExecuteVehicleUpdate;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.PartialVehicleUpdate;
 
 namespace AutoSalePlaygroundAPI.API.Controllers
 {
@@ -199,6 +202,106 @@ namespace AutoSalePlaygroundAPI.API.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Actualización parcial de un vehículo (actualiza solo los campos proporcionados).
+        /// </summary>
+        /// <param name="id">ID del vehículo a actualizar.</param>
+        /// <param name="updateDto">DTO con los campos a actualizar.</param>
+        [HttpPatch("{id}/partial")]
+        [SwaggerOperation(Summary = "Actualiza parcialmente un auto", Description = "Actualiza únicamente los campos indicados en el DTO.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Vehículo actualizado parcialmente", typeof(ResponseDto<bool>))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Datos de entrada inválidos")]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
+        public async Task<IActionResult> PartialUpdateAuto(int id, [FromBody] VehiclePartialUpdateDto updateDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Opcional: asegurarse que el ID de la ruta y el del DTO coincidan
+            updateDto.Id = id;
+
+            var command = new PartialVehicleUpdateCommand(updateDto);
+            var response = await mediator.Send(command);
+
+            if (!response.IsSuccess)
+            {
+                if (response.Code == ResponseCodes.NotFound)
+                    return NotFound(response);
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Actualización en masa (bulk update) de vehículos.
+        /// </summary>
+        /// <param name="vehiclePartialUpdateDtos">Lista de DTOs con la información parcial a actualizar en cada vehículo.</param>
+        [HttpPatch("bulk")]
+        [SwaggerOperation(Summary = "Actualiza en masa varios autos", Description = "Permite actualizar campos específicos de varios vehículos en un solo request.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Vehículos actualizados en masa", typeof(ResponseDto<bool>))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Datos de entrada inválidos")]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
+        public async Task<IActionResult> BulkUpdateVehicles([FromBody] IEnumerable<VehiclePartialUpdateDto> vehiclePartialUpdateDtos)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var command = new BulkUpdateVehiclesCommand(vehiclePartialUpdateDtos);
+            var response = await mediator.Send(command);
+
+            if (!response.IsSuccess)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Actualiza un vehículo mediante el comando ExecuteVehicleUpdate.
+        /// </summary>
+        /// <param name="vehicleId">ID del vehículo a actualizar.</param>
+        /// <param name="requestDto">DTO con los nuevos datos para el vehículo.</param>
+        [HttpPatch("{vehicleId}/execute")]
+        [SwaggerOperation(Summary = "Actualiza un vehículo mediante comando", Description = "Actualiza el vehículo con nuevos parámetros utilizando el comando ExecuteVehicleUpdate.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Vehículo actualizado", typeof(ResponseDto<bool>))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Datos de entrada inválidos")]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
+        public async Task<IActionResult> ExecuteUpdateAuto(
+            int vehicleId,
+            [FromQuery] string NewLicensePlate,
+            [FromQuery] string FuelType,
+            [FromQuery] int EngineDisplacement,
+            [FromQuery] int Horsepower)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var command = new ExecuteVehicleUpdateCommand(
+                vehicleId,
+                NewLicensePlate,
+                FuelType,
+                EngineDisplacement,
+                Horsepower);
+            var response = await mediator.Send(command);
+
+            if (!response.IsSuccess)
+            {
+                if (response.Code == ResponseCodes.NotFound)
+                    return NotFound(response);
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+
             return Ok(response);
         }
     }

@@ -8,9 +8,9 @@ namespace AutoSalePlaygroundAPI.Domain.ValueObjects
     {
         public string FuelType { get; private set; } = null!;
         public int EngineDisplacement { get; private set; }
-        public int Horsepower { get; private set; }
+        public int Horsepower { get; set; }
 
-        private Specifications() { }
+        public Specifications() { }
 
         public Specifications(string fuelType, int engineDisplacement, int horsepower)
         {
@@ -22,6 +22,8 @@ namespace AutoSalePlaygroundAPI.Domain.ValueObjects
             EngineDisplacement = engineDisplacement;
             Horsepower = horsepower;
         }
+
+
 
         public void UpdateFuelType(string newFuelType)
         {
