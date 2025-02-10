@@ -1,6 +1,6 @@
 ﻿namespace AutoSalePlaygroundAPI.Domain.DTOs
 {
-    public class VehicleDto
+    public class VehicleDto : IDto
     {
         public int Id { get; set; }
         public string LicensePlateNumber { get; set; } = string.Empty;

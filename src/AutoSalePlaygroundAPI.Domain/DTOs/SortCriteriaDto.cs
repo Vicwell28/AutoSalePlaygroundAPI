@@ -2,7 +2,7 @@
 
 namespace AutoSalePlaygroundAPI.Domain.DTOs
 {
-    public class SortCriteriaDto
+    public class SortCriteriaDto : IDto
     {
         public VehicleSortByEnum SortField { get; set; }
         public OrderByEnum SortDirection { get; set; }

@@ -22,122 +22,119 @@ namespace AutoSalePlaygroundAPI.Infrastructure.DbContexts
             base.OnModelCreating(modelBuilder);
         }
 
-        // Con el unico proposito de hacer las migraciones
-        /*
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                // Esto solo se ejecutará si las opciones no fueron configuradas.
-                optionsBuilder.UseSqlServer("TuCadenaDeConexionPorDefecto");
-            }
-            base.OnConfiguring(optionsBuilder);
-        }
-        */
-
         public override int SaveChanges()
         {
-            // Obtén los eventos de dominio pendientes
-            var domainEvents = new List<IDomainEvent>(DomainEvents.Events);
-
-            // Guarda los cambios en la base de datos
+            // Guarda los cambios iniciales
             var result = base.SaveChanges();
 
-            // Recorre y mapea cada evento de dominio a un registro de auditoría
-            foreach (var domainEvent in domainEvents)
-            {
-                var auditLog = MapDomainEventToAuditLog(domainEvent);
+            // Procesa y agrega los registros de auditoría correspondientes a los eventos de dominio
+            ProcessDomainEvents();
 
-                if (auditLog != null)
-                {
-                    AuditLogs.Add(auditLog);
-                }
-            }
-
-            // Limpia la lista de eventos de dominio y guarda nuevamente para persistir los logs
-            DomainEvents.Clear();
+            // Persiste los logs de auditoría en la base de datos
             base.SaveChanges();
 
             return result;
         }
 
-        private AuditLog? MapDomainEventToAuditLog(IDomainEvent domainEvent)
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            switch (domainEvent)
-            {
-                case VehicleOwnerChangedDomainEvent voc:
-                    return new AuditLog
-                    {
-                        EntityName = nameof(Vehicle),
-                        EntityId = voc.VehicleId,
-                        EventType = nameof(VehicleOwnerChangedDomainEvent),
-                        OldValues = $"OldOwnerId={voc.OldOwnerId}",
-                        NewValues = $"NewOwnerId={voc.NewOwnerId}",
-                        OccurredOn = voc.OccurredOn
-                    };
+            // Guarda los cambios iniciales
+            var result = await base.SaveChangesAsync(cancellationToken);
 
-                case VehicleLicensePlateUpdatedDomainEvent vlu:
-                    return new AuditLog
-                    {
-                        EntityName = nameof(Vehicle),
-                        EntityId = vlu.VehicleId,
-                        EventType = nameof(VehicleLicensePlateUpdatedDomainEvent),
-                        OldValues = $"OldPlate={vlu.OldPlate}",
-                        NewValues = $"NewPlate={vlu.NewPlate}",
-                        OccurredOn = vlu.OccurredOn
-                    };
+            // Procesa y agrega los registros de auditoría correspondientes a los eventos de dominio
+            ProcessDomainEvents();
 
-                case VehicleAccessoryAddedDomainEvent vaa:
-                    return new AuditLog
-                    {
-                        EntityName = nameof(Vehicle),
-                        EntityId = vaa.VehicleId,
-                        EventType = nameof(VehicleAccessoryAddedDomainEvent),
-                        OldValues = string.Empty,
-                        NewValues = $"AccessoryId={vaa.AccessoryId}",
-                        OccurredOn = vaa.OccurredOn
-                    };
+            // Persiste los logs de auditoría en la base de datos
+            await base.SaveChangesAsync(cancellationToken);
 
-                case VehicleSpecificationsUpdatedDomainEvent vsu:
-                    return new AuditLog
-                    {
-                        EntityName = nameof(Vehicle),
-                        EntityId = vsu.VehicleId,
-                        EventType = nameof(VehicleSpecificationsUpdatedDomainEvent),
-                        OldValues = $"OldFuelType={vsu.OldFuelType}," +
-                                    $"OldEngineDisplacement={vsu.OldEngineDisplacement}," +
-                                    $"OldHorsepower={vsu.OldHorsepower}",
-                        NewValues = $"NewFuelType={vsu.NewFuelType}," +
-                                    $"NewEngineDisplacement={vsu.NewEngineDisplacement}," +
-                                    $"NewHorsepower={vsu.NewHorsepower}",
-                        OccurredOn = vsu.OccurredOn
-                    };
-
-                case OwnerUpdatedDomainEvent ou:
-                    return new AuditLog
-                    {
-                        EntityName = nameof(Owner),
-                        EntityId = ou.OwnerId,
-                        EventType = nameof(OwnerUpdatedDomainEvent),
-                        OldValues = string.Empty,
-                        NewValues = $"NewFirstName={ou.NewFirstName},NewLastName={ou.NewLastName}",
-                        OccurredOn = ou.OccurredOn
-                    };
-
-                case AccessoryUpdatedDomainEvent au:
-                    return new AuditLog
-                    {
-                        EntityName = nameof(Accessory),
-                        EntityId = au.AccessoryId,
-                        EventType = nameof(AccessoryUpdatedDomainEvent),
-                        OldValues = string.Empty,
-                        NewValues = $"NewName={au.NewName}",
-                        OccurredOn = au.OccurredOn
-                    };
-
-                default:
-                    return null;
-            }
+            return result;
         }
+
+        /// <summary>
+        /// Extrae los eventos de dominio pendientes, los mapea a registros de auditoría y los agrega al DbSet correspondiente.
+        /// Además, limpia la lista de eventos.
+        /// </summary>
+        private void ProcessDomainEvents()
+        {
+            // Se obtiene la lista de eventos de dominio
+            var auditLogs = DomainEvents.Events
+                .Select(MapDomainEventToAuditLog)
+                .Where(auditLog => auditLog is not null)
+                .Cast<AuditLog>()
+                .ToList();
+
+            // Si se encontraron eventos, se agregan los logs resultantes
+            if (auditLogs.Any())
+            {
+                AuditLogs.AddRange(auditLogs);
+            }
+
+            // Se limpia la lista de eventos pendientes
+            DomainEvents.Clear();
+        }
+
+        /// <summary>
+        /// Mapea un evento de dominio a un objeto AuditLog usando una expresión switch.
+        /// Retorna null si el evento no es reconocido.
+        /// </summary>
+        private AuditLog? MapDomainEventToAuditLog(IDomainEvent domainEvent) =>
+            domainEvent switch
+            {
+                VehicleOwnerChangedDomainEvent voc => new AuditLog
+                {
+                    EntityName = nameof(Vehicle),
+                    EntityId = voc.VehicleId,
+                    EventType = nameof(VehicleOwnerChangedDomainEvent),
+                    OldValues = $"OldOwnerId={voc.OldOwnerId}",
+                    NewValues = $"NewOwnerId={voc.NewOwnerId}",
+                    OccurredOn = voc.OccurredOn
+                },
+                VehicleLicensePlateUpdatedDomainEvent vlu => new AuditLog
+                {
+                    EntityName = nameof(Vehicle),
+                    EntityId = vlu.VehicleId,
+                    EventType = nameof(VehicleLicensePlateUpdatedDomainEvent),
+                    OldValues = $"OldPlate={vlu.OldPlate}",
+                    NewValues = $"NewPlate={vlu.NewPlate}",
+                    OccurredOn = vlu.OccurredOn
+                },
+                VehicleAccessoryAddedDomainEvent vaa => new AuditLog
+                {
+                    EntityName = nameof(Vehicle),
+                    EntityId = vaa.VehicleId,
+                    EventType = nameof(VehicleAccessoryAddedDomainEvent),
+                    OldValues = string.Empty,
+                    NewValues = $"AccessoryId={vaa.AccessoryId}",
+                    OccurredOn = vaa.OccurredOn
+                },
+                VehicleSpecificationsUpdatedDomainEvent vsu => new AuditLog
+                {
+                    EntityName = nameof(Vehicle),
+                    EntityId = vsu.VehicleId,
+                    EventType = nameof(VehicleSpecificationsUpdatedDomainEvent),
+                    OldValues = $"OldFuelType={vsu.OldFuelType},OldEngineDisplacement={vsu.OldEngineDisplacement},OldHorsepower={vsu.OldHorsepower}",
+                    NewValues = $"NewFuelType={vsu.NewFuelType},NewEngineDisplacement={vsu.NewEngineDisplacement},NewHorsepower={vsu.NewHorsepower}",
+                    OccurredOn = vsu.OccurredOn
+                },
+                OwnerUpdatedDomainEvent ou => new AuditLog
+                {
+                    EntityName = nameof(Owner),
+                    EntityId = ou.OwnerId,
+                    EventType = nameof(OwnerUpdatedDomainEvent),
+                    OldValues = string.Empty,
+                    NewValues = $"NewFirstName={ou.NewFirstName},NewLastName={ou.NewLastName}",
+                    OccurredOn = ou.OccurredOn
+                },
+                AccessoryUpdatedDomainEvent au => new AuditLog
+                {
+                    EntityName = nameof(Accessory),
+                    EntityId = au.AccessoryId,
+                    EventType = nameof(AccessoryUpdatedDomainEvent),
+                    OldValues = string.Empty,
+                    NewValues = $"NewName={au.NewName}",
+                    OccurredOn = au.OccurredOn
+                },
+                _ => null
+            };
     }
 }

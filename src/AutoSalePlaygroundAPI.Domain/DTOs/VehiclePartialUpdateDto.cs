@@ -1,6 +1,6 @@
 ﻿namespace AutoSalePlaygroundAPI.Domain.DTOs
 {
-    public class VehiclePartialUpdateDto
+    public class VehiclePartialUpdateDto : IDto
     {
         public int Id { get; set; }
         public string? LicensePlateNumber { get; set; }

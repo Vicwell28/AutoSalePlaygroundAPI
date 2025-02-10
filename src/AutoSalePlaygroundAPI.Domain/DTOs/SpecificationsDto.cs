@@ -1,6 +1,6 @@
 ﻿namespace AutoSalePlaygroundAPI.Domain.DTOs
 {
-    public class SpecificationsDto
+    public class SpecificationsDto : IDto
     {
         public string FuelType { get; set; } = string.Empty;
         public int EngineDisplacement { get; set; }

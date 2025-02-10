@@ -1,6 +1,6 @@
 ﻿namespace AutoSalePlaygroundAPI.Domain.DTOs.Response
 {
-    public class BaseResponseDto
+    public class BaseResponseDto : IDto
     {
         public bool IsSuccess => Errors == null || !Errors.Any();
         public string? Message { get; protected set; }

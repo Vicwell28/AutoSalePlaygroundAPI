@@ -1,6 +1,6 @@
 ﻿namespace AutoSalePlaygroundAPI.Domain.DTOs
 {
-    public class AccessoryDto
+    public class AccessoryDto : IDto
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
