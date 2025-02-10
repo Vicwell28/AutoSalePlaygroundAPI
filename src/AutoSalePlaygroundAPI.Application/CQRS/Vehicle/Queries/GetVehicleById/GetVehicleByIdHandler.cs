@@ -6,18 +6,15 @@ using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehicleById
 {
-    public class GetVehicleByIdHandler : IRequestHandler<GetVehicleByIdQuery, ResponseDto<VehicleDto>>
+    public class GetVehicleByIdHandler(
+        IVehicleService vehicleService,
+        IMapper mapper) : IRequestHandler<GetVehicleByIdQuery, ResponseDto<VehicleDto>>
     {
-        private readonly IVehicleService _vehicleService;
-        private readonly IMapper _mapper;
-
-        public GetVehicleByIdHandler(
-            IVehicleService vehicleService,
-            IMapper mapper)
-        {
-            _vehicleService = vehicleService ?? throw new ArgumentNullException(nameof(vehicleService));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        }
+        private readonly IVehicleService _vehicleService = vehicleService 
+            ?? throw new ArgumentNullException(nameof(vehicleService));
+        
+        private readonly IMapper _mapper = mapper 
+            ?? throw new ArgumentNullException(nameof(mapper));
 
         public async Task<ResponseDto<VehicleDto>> Handle(GetVehicleByIdQuery request, CancellationToken cancellationToken)
         {

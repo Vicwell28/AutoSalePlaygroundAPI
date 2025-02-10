@@ -4,5 +4,6 @@ using AutoSalePlaygroundAPI.Application.Interfaces;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Accessory.Queries.GetAllAccessories
 {
-    public class GetAllAccessoriesQuery : IQuery<ResponseDto<List<AccessoryDto>>> { }
+    public record GetAllAccessoriesQuery() 
+        : IQuery<ResponseDto<List<AccessoryDto>>>;
 }

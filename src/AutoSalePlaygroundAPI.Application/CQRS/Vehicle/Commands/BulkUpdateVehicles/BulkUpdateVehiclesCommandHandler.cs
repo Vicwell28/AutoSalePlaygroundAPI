@@ -5,15 +5,11 @@ using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.BulkUpdateVehicles
 {
-    public class BulkUpdateVehiclesCommandHandler
-        : IRequestHandler<BulkUpdateVehiclesCommand, ResponseDto<bool>>
+    public class BulkUpdateVehiclesCommandHandler(IVehicleService vehicleService)
+                : IRequestHandler<BulkUpdateVehiclesCommand, ResponseDto<bool>>
     {
-        private readonly IVehicleService _vehicleService;
-
-        public BulkUpdateVehiclesCommandHandler(IVehicleService vehicleService)
-        {
-            _vehicleService = vehicleService ?? throw new ArgumentNullException(nameof(vehicleService));
-        }
+        private readonly IVehicleService _vehicleService = vehicleService 
+            ?? throw new ArgumentNullException(nameof(vehicleService));
 
         public async Task<ResponseDto<bool>> Handle(BulkUpdateVehiclesCommand request, CancellationToken cancellationToken)
         {

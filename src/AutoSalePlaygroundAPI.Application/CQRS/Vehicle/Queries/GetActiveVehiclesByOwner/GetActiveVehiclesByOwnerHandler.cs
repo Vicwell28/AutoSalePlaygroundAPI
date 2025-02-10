@@ -1,23 +1,20 @@
 ﻿using AutoMapper;
+using AutoSalePlaygroundAPI.Application.Interfaces;
 using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.DTOs.Response;
-using AutoSalePlaygroundAPI.Application.Interfaces;
 using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetActiveVehiclesByOwner
 {
-    public class GetActiveVehiclesByOwnerHandler : IRequestHandler<GetActiveVehiclesByOwnerQuery, ResponseDto<List<VehicleDto>>>
+    public class GetActiveVehiclesByOwnerHandler(
+        IVehicleService vehicleService,
+        IMapper mapper) : IRequestHandler<GetActiveVehiclesByOwnerQuery, ResponseDto<List<VehicleDto>>>
     {
-        private readonly IVehicleService _vehicleService;
-        private readonly IMapper _mapper;
-
-        public GetActiveVehiclesByOwnerHandler(
-            IVehicleService vehicleService,
-            IMapper mapper)
-        {
-            _vehicleService = vehicleService ?? throw new ArgumentNullException(nameof(vehicleService));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        }
+        private readonly IVehicleService _vehicleService = vehicleService 
+            ?? throw new ArgumentNullException(nameof(vehicleService));
+        
+        private readonly IMapper _mapper = mapper 
+            ?? throw new ArgumentNullException(nameof(mapper));
 
         public async Task<ResponseDto<List<VehicleDto>>> Handle(GetActiveVehiclesByOwnerQuery request, CancellationToken cancellationToken)
         {

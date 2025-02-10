@@ -7,16 +7,14 @@ using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.UpdateVehicle
 {
-    public class UpdateVehicleHandler : IRequestHandler<UpdateVehicleCommand, ResponseDto<VehicleDto>>
+    public class UpdateVehicleHandler(IRepository<Domain.Entities.Vehicle> vehicleRepository, IMapper mapper) 
+        : IRequestHandler<UpdateVehicleCommand, ResponseDto<VehicleDto>>
     {
-        private readonly IRepository<Domain.Entities.Vehicle> _vehicleRepository;
-        private readonly IMapper _mapper;
-
-        public UpdateVehicleHandler(IRepository<Domain.Entities.Vehicle> vehicleRepository, IMapper mapper)
-        {
-            _vehicleRepository = vehicleRepository ?? throw new ArgumentNullException(nameof(vehicleRepository));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        }
+        private readonly IRepository<Domain.Entities.Vehicle> _vehicleRepository = vehicleRepository 
+            ?? throw new ArgumentNullException(nameof(vehicleRepository));
+        
+        private readonly IMapper _mapper = mapper 
+            ?? throw new ArgumentNullException(nameof(mapper));
 
         public async Task<ResponseDto<VehicleDto>> Handle(UpdateVehicleCommand request, CancellationToken cancellationToken)
         {

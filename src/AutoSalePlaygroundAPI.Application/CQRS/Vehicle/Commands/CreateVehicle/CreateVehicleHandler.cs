@@ -1,27 +1,25 @@
 ﻿using AutoMapper;
+using AutoSalePlaygroundAPI.Application.Interfaces;
 using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.DTOs.Response;
-using AutoSalePlaygroundAPI.Application.Interfaces;
 using AutoSalePlaygroundAPI.Domain.ValueObjects;
 using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.CreateVehicle
 {
-    public class CreateVehicleHandler : IRequestHandler<CreateVehicleCommand, ResponseDto<VehicleDto>>
+    public class CreateVehicleHandler(
+        IOwnerService ownerService,
+        IVehicleService vehicleService,
+        IMapper mapper) : IRequestHandler<CreateVehicleCommand, ResponseDto<VehicleDto>>
     {
-        private readonly IMapper _mapper;
-        private readonly IOwnerService _ownerService;
-        private readonly IVehicleService _vehicleService;
+        private readonly IMapper _mapper = mapper 
+            ?? throw new ArgumentNullException(nameof(mapper));
 
-        public CreateVehicleHandler(
-            IOwnerService ownerService,
-            IVehicleService vehicleService,
-            IMapper mapper)
-        {
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _ownerService = ownerService ?? throw new ArgumentNullException(nameof(ownerService));
-            _vehicleService = vehicleService ?? throw new ArgumentNullException(nameof(vehicleService));
-        }
+        private readonly IOwnerService _ownerService = ownerService 
+            ?? throw new ArgumentNullException(nameof(ownerService));
+
+        private readonly IVehicleService _vehicleService = vehicleService 
+            ?? throw new ArgumentNullException(nameof(vehicleService));
 
         public async Task<ResponseDto<VehicleDto>> Handle(CreateVehicleCommand request, CancellationToken cancellationToken)
         {

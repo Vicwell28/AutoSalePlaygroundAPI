@@ -8,16 +8,13 @@ using System.Linq.Expressions;
 
 namespace AutoSalePlaygroundAPI.Infrastructure.Repositories
 {
-    public class Repository<T> : IRepository<T> where T : class, IEntity
+    public class Repository<T>(AutoSalePlaygroundAPIDbContext dbContext) 
+        : IRepository<T> where T : class, IEntity
     {
-        private readonly AutoSalePlaygroundAPIDbContext _dbContext;
+        private readonly AutoSalePlaygroundAPIDbContext _dbContext = dbContext 
+            ?? throw new ArgumentNullException(nameof(dbContext));
 
         public AutoSalePlaygroundAPIDbContext DbContext => _dbContext;
-
-        public Repository(AutoSalePlaygroundAPIDbContext dbContext)
-        {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-        }
 
         #region Métodos CRUD
 

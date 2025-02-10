@@ -6,7 +6,7 @@ namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.PartialVehicle
     {
         public PartialVehicleUpdateCommandValidator()
         {
-            RuleFor(x => x.UpdateDto.Id).GreaterThan(0).WithMessage("El Id del vehículo debe ser mayor que 0.");
+            RuleFor(x => x.Id).GreaterThan(0).WithMessage("El Id del vehículo debe ser mayor que 0.");
         }
     }
 }

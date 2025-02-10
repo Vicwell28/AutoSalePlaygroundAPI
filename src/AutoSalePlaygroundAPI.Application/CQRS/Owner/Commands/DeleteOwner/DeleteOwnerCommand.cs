@@ -1,15 +1,8 @@
-﻿using AutoSalePlaygroundAPI.Domain.DTOs.Response;
-using AutoSalePlaygroundAPI.Application.Interfaces;
+﻿using AutoSalePlaygroundAPI.Application.Interfaces;
+using AutoSalePlaygroundAPI.Domain.DTOs.Response;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Owner.Commands.DeleteOwner
 {
-    public class DeleteOwnerCommand : ICommand<ResponseDto<bool>>
-    {
-        public int OwnerId { get; }
-
-        public DeleteOwnerCommand(int ownerId)
-        {
-            OwnerId = ownerId;
-        }
-    }
+    public record DeleteOwnerCommand(int OwnerId) 
+        : ICommand<ResponseDto<bool>>, IRequireValidation;
 }

@@ -6,21 +6,19 @@ using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.ChangeVehicleOwner
 {
-    public class ChangeVehicleOwnerHandler : IRequestHandler<ChangeVehicleOwnerCommand, ResponseDto<VehicleDto>>
+    public class ChangeVehicleOwnerHandler(
+        IVehicleService vehicleService,
+        IOwnerService ownerService,
+        IMapper mapper) : IRequestHandler<ChangeVehicleOwnerCommand, ResponseDto<VehicleDto>>
     {
-        private readonly IVehicleService _vehicleService;
-        private readonly IOwnerService _ownerService;
-        private readonly IMapper _mapper;
+        private readonly IVehicleService _vehicleService = vehicleService 
+            ?? throw new ArgumentNullException(nameof(vehicleService));
 
-        public ChangeVehicleOwnerHandler(
-            IVehicleService vehicleService,
-            IOwnerService ownerService,
-            IMapper mapper)
-        {
-            _vehicleService = vehicleService ?? throw new ArgumentNullException(nameof(vehicleService));
-            _ownerService = ownerService ?? throw new ArgumentNullException(nameof(ownerService));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        }
+        private readonly IOwnerService _ownerService = ownerService 
+            ?? throw new ArgumentNullException(nameof(ownerService));
+
+        private readonly IMapper _mapper = mapper 
+            ?? throw new ArgumentNullException(nameof(mapper));
 
         public async Task<ResponseDto<VehicleDto>> Handle(ChangeVehicleOwnerCommand request, CancellationToken cancellationToken)
         {

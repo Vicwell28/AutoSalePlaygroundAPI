@@ -1,21 +1,19 @@
 ﻿using AutoMapper;
+using AutoSalePlaygroundAPI.Application.Interfaces;
 using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.DTOs.Response;
-using AutoSalePlaygroundAPI.Application.Interfaces;
 using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Accessory.Queries.GetAccessoryById
 {
-    public class GetAccessoryByIdQueryHandler : IRequestHandler<GetAccessoryByIdQuery, ResponseDto<AccessoryDto>>
+    public class GetAccessoryByIdQueryHandler(IAccessoryService accessoryService, IMapper mapper) 
+        : IRequestHandler<GetAccessoryByIdQuery, ResponseDto<AccessoryDto>>
     {
-        private readonly IAccessoryService _accessoryService;
-        private readonly IMapper _mapper;
-
-        public GetAccessoryByIdQueryHandler(IAccessoryService accessoryService, IMapper mapper)
-        {
-            _accessoryService = accessoryService;
-            _mapper = mapper;
-        }
+        private readonly IAccessoryService _accessoryService = accessoryService 
+            ?? throw new ArgumentNullException(nameof(accessoryService));
+        
+        private readonly IMapper _mapper = mapper 
+            ?? throw new ArgumentNullException(nameof(mapper));
 
         public async Task<ResponseDto<AccessoryDto>> Handle(GetAccessoryByIdQuery request, CancellationToken cancellationToken)
         {

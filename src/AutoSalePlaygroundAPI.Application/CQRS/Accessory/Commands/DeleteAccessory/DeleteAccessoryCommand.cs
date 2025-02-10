@@ -1,15 +1,8 @@
-﻿using AutoSalePlaygroundAPI.Domain.DTOs.Response;
-using AutoSalePlaygroundAPI.Application.Interfaces;
+﻿using AutoSalePlaygroundAPI.Application.Interfaces;
+using AutoSalePlaygroundAPI.Domain.DTOs.Response;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Accessory.Commands.DeleteAccessory
 {
-    public class DeleteAccessoryCommand : ICommand<ResponseDto<bool>>
-    {
-        public int AccessoryId { get; }
-
-        public DeleteAccessoryCommand(int accessoryId)
-        {
-            AccessoryId = accessoryId;
-        }
-    }
+    public record DeleteAccessoryCommand(int AccessoryId) 
+        : ICommand<ResponseDto<bool>>, IRequireValidation;
 }

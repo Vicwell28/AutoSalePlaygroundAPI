@@ -23,8 +23,6 @@ namespace AutoSalePlaygroundAPI.Domain.ValueObjects
             Horsepower = horsepower;
         }
 
-
-
         public void UpdateFuelType(string newFuelType)
         {
             Guard.Against.NullOrWhiteSpace(newFuelType, nameof(newFuelType), "El nuevo tipo de combustible no puede ser nulo o vacío.");

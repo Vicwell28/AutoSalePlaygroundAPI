@@ -1,17 +1,14 @@
-﻿using AutoSalePlaygroundAPI.Domain.DTOs.Response;
-using AutoSalePlaygroundAPI.Application.Interfaces;
+﻿using AutoSalePlaygroundAPI.Application.Interfaces;
+using AutoSalePlaygroundAPI.Domain.DTOs.Response;
 using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Owner.Commands.DeleteOwner
 {
-    public class DeleteOwnerHandler : IRequestHandler<DeleteOwnerCommand, ResponseDto<bool>>
+    public class DeleteOwnerHandler(IOwnerService ownerService) 
+        : IRequestHandler<DeleteOwnerCommand, ResponseDto<bool>>
     {
-        private readonly IOwnerService _ownerService;
-
-        public DeleteOwnerHandler(IOwnerService ownerService)
-        {
-            _ownerService = ownerService;
-        }
+        private readonly IOwnerService _ownerService = ownerService 
+            ?? throw new ArgumentNullException(nameof(ownerService));
 
         public async Task<ResponseDto<bool>> Handle(DeleteOwnerCommand request, CancellationToken cancellationToken)
         {

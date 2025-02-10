@@ -1,19 +1,16 @@
 ﻿using AutoMapper;
+using AutoSalePlaygroundAPI.Application.Interfaces;
 using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.DTOs.Response;
-using AutoSalePlaygroundAPI.Application.Interfaces;
 using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Owner.Commands.CreateOwner
 {
-    public class CreateOwnerHandler : IRequestHandler<CreateOwnerCommand, ResponseDto<OwnerDto>>
+    public class CreateOwnerHandler(IOwnerService ownerService, IMapper mapper) 
+        : IRequestHandler<CreateOwnerCommand, ResponseDto<OwnerDto>>
     {
-        private readonly IOwnerService _ownerService;
-
-        public CreateOwnerHandler(IOwnerService ownerService, IMapper mapper)
-        {
-            _ownerService = ownerService;
-        }
+        private readonly IOwnerService _ownerService = ownerService 
+            ?? throw new ArgumentNullException(nameof(ownerService));
 
         public async Task<ResponseDto<OwnerDto>> Handle(CreateOwnerCommand request, CancellationToken cancellationToken)
         {

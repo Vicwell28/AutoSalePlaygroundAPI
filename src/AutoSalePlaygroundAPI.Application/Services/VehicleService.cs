@@ -4,7 +4,6 @@ using AutoSalePlaygroundAPI.Domain.Entities;
 using AutoSalePlaygroundAPI.Domain.Specifications;
 using AutoSalePlaygroundAPI.Domain.ValueObjects;
 using AutoSalePlaygroundAPI.Infrastructure.Interfaces;
-using System.Text.Json;
 
 namespace AutoSalePlaygroundAPI.Application.Services
 {
@@ -13,22 +12,19 @@ namespace AutoSalePlaygroundAPI.Application.Services
     /// Este servicio utiliza especificaciones para filtrar y paginar resultados y delega el acceso a datos en un repositorio genérico.
     /// Además, implementa métodos para actualizaciones completas, parciales y en bloque, y se integra con un pipeline de transacciones centralizado.
     /// </summary>
-    public class VehicleService : IVehicleService
+    /// <remarks>
+    /// Inicializa una nueva instancia de <see cref="VehicleService"/>.
+    /// </remarks>
+    /// <param name="vehicleRepository">Repositorio para la entidad <see cref="Vehicle"/>.</param>
+    /// <param name="accessoryRepository">Repositorio para la entidad <see cref="Accessory"/>.</param>
+    /// <exception cref="ArgumentNullException">Se lanza si alguno de los repositorios es <c>null</c>.</exception>
+    public class VehicleService(IRepository<Vehicle> vehicleRepository, IRepository<Accessory> accessoryRepository) : IVehicleService
     {
-        private readonly IRepository<Vehicle> _vehicleRepository;
-        private readonly IRepository<Accessory> _accessoryRepository;
+        private readonly IRepository<Vehicle> _vehicleRepository = vehicleRepository
+            ?? throw new ArgumentNullException(nameof(vehicleRepository));
 
-        /// <summary>
-        /// Inicializa una nueva instancia de <see cref="VehicleService"/>.
-        /// </summary>
-        /// <param name="vehicleRepository">Repositorio para la entidad <see cref="Vehicle"/>.</param>
-        /// <param name="accessoryRepository">Repositorio para la entidad <see cref="Accessory"/>.</param>
-        /// <exception cref="ArgumentNullException">Se lanza si alguno de los repositorios es <c>null</c>.</exception>
-        public VehicleService(IRepository<Vehicle> vehicleRepository, IRepository<Accessory> accessoryRepository)
-        {
-            _vehicleRepository = vehicleRepository ?? throw new ArgumentNullException(nameof(vehicleRepository));
-            _accessoryRepository = accessoryRepository ?? throw new ArgumentNullException(nameof(accessoryRepository));
-        }
+        private readonly IRepository<Accessory> _accessoryRepository = accessoryRepository
+            ?? throw new ArgumentNullException(nameof(accessoryRepository));
 
         /// <inheritdoc />
         public async Task<List<Vehicle>> GetActiveVehiclesByOwnerAsync(int ownerId)

@@ -8,45 +8,33 @@ namespace AutoSalePlaygroundAPI.Application.Services
     /// <summary>
     /// Servicio de aplicación para gestionar operaciones relacionadas con accesorios.
     /// </summary>
-    public class AccessoryService : IAccessoryService
+    public class AccessoryService(IRepository<Accessory> accessoryRepository) : IAccessoryService
     {
-        private readonly IRepository<Accessory> _accessoryRepository;
+        private readonly IRepository<Accessory> _accessoryRepository = accessoryRepository
+            ?? throw new ArgumentNullException(nameof(accessoryRepository));
 
-        public AccessoryService(IRepository<Accessory> accessoryRepository)
-        {
-            _accessoryRepository = accessoryRepository;
-        }
-
-        /// <summary>
-        /// Obtiene un accesorio por su Id.
-        /// </summary>
+        /// <inheritdoc />
         public async Task<Accessory?> GetAccessoryByIdAsync(int accessoryId)
         {
             var spec = new GenericAccessorySpec(a => a.Id == accessoryId);
             return await _accessoryRepository.FirstOrDefaultAsync(spec);
         }
 
-        /// <summary>
-        /// Obtiene todos los accesorios activos.
-        /// </summary>
+        /// <inheritdoc />
         public async Task<List<Accessory>> GetAllActiveAccessoriesAsync()
         {
             var spec = new ActiveAccessorySpec();
             return await _accessoryRepository.ListAsync(spec);
         }
 
-        /// <summary>
-        /// Agrega un nuevo accesorio.
-        /// </summary>
+        /// <inheritdoc />
         public async Task AddNewAccessoryAsync(string name)
         {
             var accessory = new Accessory(name);
             await _accessoryRepository.AddAsync(accessory);
         }
 
-        /// <summary>
-        /// Actualiza el nombre de un accesorio.
-        /// </summary>
+        /// <inheritdoc />
         public async Task UpdateAccessoryNameAsync(int accessoryId, string newName)
         {
             var accessory = await GetAccessoryByIdAsync(accessoryId);

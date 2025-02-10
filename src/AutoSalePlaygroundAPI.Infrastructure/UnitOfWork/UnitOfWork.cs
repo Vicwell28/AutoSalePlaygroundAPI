@@ -3,21 +3,20 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace AutoSalePlaygroundAPI.Infrastructure
 {
-    public class UnitOfWork : IUnitOfWork
+    public class UnitOfWork(AutoSalePlaygroundAPIDbContext dbContext) : IUnitOfWork
     {
-        private readonly AutoSalePlaygroundAPIDbContext _dbContext;
+        private readonly AutoSalePlaygroundAPIDbContext _dbContext = dbContext
+            ?? throw new ArgumentNullException(nameof(dbContext));
+
         private IDbContextTransaction? _currentTransaction;
 
-        public UnitOfWork(AutoSalePlaygroundAPIDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
-
+        /// <inheritdoc />
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
         {
             _currentTransaction ??= await _dbContext.Database.BeginTransactionAsync(cancellationToken);
         }
 
+        /// <inheritdoc />
         public async Task CommitAsync(CancellationToken cancellationToken = default)
         {
             if (_currentTransaction != null)
@@ -29,6 +28,7 @@ namespace AutoSalePlaygroundAPI.Infrastructure
             }
         }
 
+        /// <inheritdoc />
         public async Task RollbackAsync(CancellationToken cancellationToken = default)
         {
             if (_currentTransaction != null)

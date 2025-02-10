@@ -1,28 +1,28 @@
 ﻿using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.AddVehicleAccessories;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.BulkUpdateVehicles;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.CreateVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.DeleteVehicle;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.ExecuteVehicleUpdate;
+using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.PartialVehicleUpdate;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.UpdateVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetActiveVehiclesByOwnerPaged;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle;
 using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehicleById;
+using AutoSalePlaygroundAPI.CrossCutting.Enum;
 using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.DTOs.Response;
-using AutoSalePlaygroundAPI.CrossCutting.Constants;
-using AutoSalePlaygroundAPI.CrossCutting.Enum;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.BulkUpdateVehicles;
-using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.ExecuteVehicleUpdate;
-using AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.PartialVehicleUpdate;
 
 namespace AutoSalePlaygroundAPI.API.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
     [SwaggerTag("Controlador para gestionar los Autos")]
-    public class VehiclesController(IMediator mediator) : ControllerBase
+    public class VehiclesController : BaseApiController
     {
+        public VehiclesController(IMediator mediator) : base(mediator) { }
+
         /// <summary>
         /// Obtiene la lista completa de autos (vía CQRS).
         /// </summary>
@@ -33,14 +33,8 @@ namespace AutoSalePlaygroundAPI.API.Controllers
         public async Task<IActionResult> GetAllAutos()
         {
             var query = new GetAllVehiclesQuery();
-            var response = await mediator.Send(query);
-
-            if (!response.IsSuccess)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-
-            return Ok(response);
+            var response = await Mediator.Send(query);
+            return ProcessResponse(response);
         }
 
         /// <summary>
@@ -55,17 +49,8 @@ namespace AutoSalePlaygroundAPI.API.Controllers
         public async Task<IActionResult> GetAutoById(int id)
         {
             var query = new GetVehicleByIdQuery(id);
-            var response = await mediator.Send(query);
-
-            if (!response.IsSuccess)
-            {
-                if (response.Code == ResponseCodes.NotFound)
-                    return NotFound(response);
-
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-
-            return Ok(response);
+            var response = await Mediator.Send(query);
+            return ProcessResponse(response);
         }
 
         /// <summary>
@@ -79,20 +64,9 @@ namespace AutoSalePlaygroundAPI.API.Controllers
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
         public async Task<IActionResult> CreateAuto([FromBody] VehicleDto autoDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var command = new CreateVehicleCommand(autoDto.LicensePlateNumber, autoDto.OwnerId, autoDto.Specifications.FuelType, autoDto.Specifications.EngineDisplacement, autoDto.Specifications.Horsepower);
-            var response = await mediator.Send(command);
-
-            if (!response.IsSuccess)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-
-            return Ok(response);
+            var response = await Mediator.Send(command);
+            return ProcessResponse(response);
         }
 
         /// <summary>
@@ -108,23 +82,9 @@ namespace AutoSalePlaygroundAPI.API.Controllers
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
         public async Task<IActionResult> UpdateAuto(int id, [FromBody] VehicleDto autoDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var command = new UpdateVehicleCommand(id, autoDto.Specifications.FuelType, autoDto.Specifications.EngineDisplacement, autoDto.Specifications.Horsepower);
-            var response = await mediator.Send(command);
-
-            if (!response.IsSuccess)
-            {
-                if (response.Code == ResponseCodes.NotFound)
-                    return NotFound(response);
-
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-
-            return Ok(response);
+            var response = await Mediator.Send(command);
+            return ProcessResponse(response);
         }
 
         /// <summary>
@@ -139,17 +99,8 @@ namespace AutoSalePlaygroundAPI.API.Controllers
         public async Task<IActionResult> DeleteAuto(int id)
         {
             var command = new DeleteVehicleCommand(id);
-            var response = await mediator.Send(command);
-
-            if (!response.IsSuccess)
-            {
-                if (response.Code == ResponseCodes.NotFound)
-                    return NotFound(response);
-
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-
-            return Ok(response);
+            var response = await Mediator.Send(command);
+            return ProcessResponse(response);
         }
 
         /// <summary>
@@ -173,14 +124,8 @@ namespace AutoSalePlaygroundAPI.API.Controllers
             OrderByEnum orderByEnum)
         {
             var query = new GetActiveVehiclesByOwnerPagedQuery(ownerId, pageNumber, pageSize, vehicleSortByEnum, orderByEnum);
-            var response = await mediator.Send(query);
-
-            if (!response.IsSuccess)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-
-            return Ok(response);
+            var response = await Mediator.Send(query);
+            return ProcessResponse(response);
         }
 
         /// <summary>
@@ -196,13 +141,8 @@ namespace AutoSalePlaygroundAPI.API.Controllers
         public async Task<IActionResult> AddVehicleAccessories(int vehicleId, [FromBody] List<int> accessoryIds)
         {
             var command = new AddVehicleAccessoriesCommand(vehicleId, accessoryIds);
-            var response = await mediator.Send(command);
-
-            if (!response.IsSuccess)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            return Ok(response);
+            var response = await Mediator.Send(command);
+            return ProcessResponse(response);
         }
 
         /// <summary>
@@ -217,25 +157,9 @@ namespace AutoSalePlaygroundAPI.API.Controllers
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
         public async Task<IActionResult> PartialUpdateAuto(int id, [FromBody] VehiclePartialUpdateDto updateDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            // Opcional: asegurarse que el ID de la ruta y el del DTO coincidan
-            updateDto.Id = id;
-
-            var command = new PartialVehicleUpdateCommand(updateDto);
-            var response = await mediator.Send(command);
-
-            if (!response.IsSuccess)
-            {
-                if (response.Code == ResponseCodes.NotFound)
-                    return NotFound(response);
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-
-            return Ok(response);
+            var command = new PartialVehicleUpdateCommand(id, updateDto);
+            var response = await Mediator.Send(command);
+            return ProcessResponse(response);
         }
 
         /// <summary>
@@ -249,20 +173,9 @@ namespace AutoSalePlaygroundAPI.API.Controllers
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
         public async Task<IActionResult> BulkUpdateVehicles([FromBody] IEnumerable<VehiclePartialUpdateDto> vehiclePartialUpdateDtos)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var command = new BulkUpdateVehiclesCommand(vehiclePartialUpdateDtos);
-            var response = await mediator.Send(command);
-
-            if (!response.IsSuccess)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-
-            return Ok(response);
+            var response = await Mediator.Send(command);
+            return ProcessResponse(response);
         }
 
         /// <summary>
@@ -282,27 +195,15 @@ namespace AutoSalePlaygroundAPI.API.Controllers
             [FromQuery] int EngineDisplacement,
             [FromQuery] int Horsepower)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var command = new ExecuteVehicleUpdateCommand(
                 vehicleId,
                 NewLicensePlate,
                 FuelType,
                 EngineDisplacement,
                 Horsepower);
-            var response = await mediator.Send(command);
 
-            if (!response.IsSuccess)
-            {
-                if (response.Code == ResponseCodes.NotFound)
-                    return NotFound(response);
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-
-            return Ok(response);
+            var response = await Mediator.Send(command);
+            return ProcessResponse(response);
         }
     }
 }

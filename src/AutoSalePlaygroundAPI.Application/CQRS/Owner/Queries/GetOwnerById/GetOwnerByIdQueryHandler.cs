@@ -6,16 +6,14 @@ using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Owner.Queries.GetOwnerById
 {
-    public class GetOwnerByIdQueryHandler : IRequestHandler<GetOwnerByIdQuery, ResponseDto<OwnerDto>>
+    public class GetOwnerByIdQueryHandler(IOwnerService ownerService, IMapper mapper) 
+        : IRequestHandler<GetOwnerByIdQuery, ResponseDto<OwnerDto>>
     {
-        private readonly IOwnerService _ownerService;
-        private readonly IMapper _mapper;
-
-        public GetOwnerByIdQueryHandler(IOwnerService ownerService, IMapper mapper)
-        {
-            _ownerService = ownerService;
-            _mapper = mapper;
-        }
+        private readonly IOwnerService _ownerService = ownerService 
+            ?? throw new ArgumentNullException(nameof(ownerService));
+        
+        private readonly IMapper _mapper = mapper 
+            ?? throw new ArgumentNullException(nameof(mapper));
 
         public async Task<ResponseDto<OwnerDto>> Handle(GetOwnerByIdQuery request, CancellationToken cancellationToken)
         {

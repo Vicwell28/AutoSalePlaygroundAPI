@@ -4,14 +4,11 @@ using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.ExecuteVehicleUpdate
 {
-    public class ExecuteVehicleUpdateHandler : IRequestHandler<ExecuteVehicleUpdateCommand, ResponseDto<bool>>
+    public class ExecuteVehicleUpdateHandler(IVehicleService vehicleService)
+        : IRequestHandler<ExecuteVehicleUpdateCommand, ResponseDto<bool>>
     {
-        private readonly IVehicleService _vehicleService;
-
-        public ExecuteVehicleUpdateHandler(IVehicleService vehicleService)
-        {
-            _vehicleService = vehicleService;
-        }
+        private readonly IVehicleService _vehicleService = vehicleService
+            ?? throw new ArgumentNullException(nameof(vehicleService));
 
         public async Task<ResponseDto<bool>> Handle(ExecuteVehicleUpdateCommand request, CancellationToken cancellationToken)
         {

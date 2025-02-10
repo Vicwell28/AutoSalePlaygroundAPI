@@ -5,23 +5,17 @@ using AutoSalePlaygroundAPI.Application.CQRS.Accessory.Queries.GetAccessoryById;
 using AutoSalePlaygroundAPI.Application.CQRS.Accessory.Queries.GetAllAccessories;
 using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.DTOs.Response;
-using AutoSalePlaygroundAPI.CrossCutting.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AutoSalePlaygroundAPI.API.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
     [SwaggerTag("Controlador para gestionar los Accesorios")]
-    public class AccessoryController : ControllerBase
+    public class AccessoryController : BaseApiController
     {
-        private readonly IMediator _mediator;
-        public AccessoryController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        public AccessoryController(IMediator mediator) : base(mediator) { }
 
         [HttpGet]
         [SwaggerOperation(
@@ -33,12 +27,8 @@ namespace AutoSalePlaygroundAPI.API.Controllers
         public async Task<IActionResult> GetAllAccessories()
         {
             var query = new GetAllAccessoriesQuery();
-            var response = await _mediator.Send(query);
-            if (!response.IsSuccess)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            return Ok(response);
+            var response = await Mediator.Send(query);
+            return ProcessResponse(response);
         }
 
         [HttpGet("{id}")]
@@ -52,14 +42,8 @@ namespace AutoSalePlaygroundAPI.API.Controllers
         public async Task<IActionResult> GetAccessoryById(int id)
         {
             var query = new GetAccessoryByIdQuery(id);
-            var response = await _mediator.Send(query);
-            if (!response.IsSuccess)
-            {
-                if (response.Code == ResponseCodes.NotFound)
-                    return NotFound(response);
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            return Ok(response);
+            var response = await Mediator.Send(query);
+            return ProcessResponse(response);
         }
 
         [HttpPost]
@@ -72,17 +56,9 @@ namespace AutoSalePlaygroundAPI.API.Controllers
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
         public async Task<IActionResult> CreateAccessory([FromBody] AccessoryDto accessoryDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
             var command = new CreateAccessoryCommand(accessoryDto.Name);
-            var response = await _mediator.Send(command);
-            if (!response.IsSuccess)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            return Ok(response);
+            var response = await Mediator.Send(command);
+            return ProcessResponse(response);
         }
 
         [HttpPut("{id}")]
@@ -96,19 +72,9 @@ namespace AutoSalePlaygroundAPI.API.Controllers
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
         public async Task<IActionResult> UpdateAccessory(int id, [FromBody] AccessoryDto accessoryDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
             var command = new UpdateAccessoryCommand(id, accessoryDto.Name);
-            var response = await _mediator.Send(command);
-            if (!response.IsSuccess)
-            {
-                if (response.Code == ResponseCodes.NotFound)
-                    return NotFound(response);
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            return Ok(response);
+            var response = await Mediator.Send(command);
+            return ProcessResponse(response);
         }
 
         [HttpDelete("{id}")]
@@ -122,14 +88,8 @@ namespace AutoSalePlaygroundAPI.API.Controllers
         public async Task<IActionResult> DeleteAccessory(int id)
         {
             var command = new DeleteAccessoryCommand(id);
-            var response = await _mediator.Send(command);
-            if (!response.IsSuccess)
-            {
-                if (response.Code == ResponseCodes.NotFound)
-                    return NotFound(response);
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            return Ok(response);
+            var response = await Mediator.Send(command);
+            return ProcessResponse(response);
         }
     }
 }

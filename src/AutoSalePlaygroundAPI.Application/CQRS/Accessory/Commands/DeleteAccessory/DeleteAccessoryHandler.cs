@@ -1,17 +1,14 @@
-﻿using AutoSalePlaygroundAPI.Domain.DTOs.Response;
-using AutoSalePlaygroundAPI.Application.Interfaces;
+﻿using AutoSalePlaygroundAPI.Application.Interfaces;
+using AutoSalePlaygroundAPI.Domain.DTOs.Response;
 using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Accessory.Commands.DeleteAccessory
 {
-    public class DeleteAccessoryHandler : IRequestHandler<DeleteAccessoryCommand, ResponseDto<bool>>
+    public class DeleteAccessoryHandler(IAccessoryService accessoryService) 
+        : IRequestHandler<DeleteAccessoryCommand, ResponseDto<bool>>
     {
-        private readonly IAccessoryService _accessoryService;
-
-        public DeleteAccessoryHandler(IAccessoryService accessoryService)
-        {
-            _accessoryService = accessoryService;
-        }
+        private readonly IAccessoryService _accessoryService = accessoryService
+            ?? throw new ArgumentNullException(nameof(accessoryService));
 
         public async Task<ResponseDto<bool>> Handle(DeleteAccessoryCommand request, CancellationToken cancellationToken)
         {

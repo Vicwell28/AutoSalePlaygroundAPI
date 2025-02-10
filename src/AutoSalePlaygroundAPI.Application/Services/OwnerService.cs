@@ -8,18 +8,12 @@ namespace AutoSalePlaygroundAPI.Application.Services
     /// <summary>
     /// Servicio de aplicación para gestionar operaciones relacionadas con propietarios.
     /// </summary>
-    public class OwnerService : IOwnerService
+    public class OwnerService(IRepository<Owner> ownerRepository) : IOwnerService
     {
-        private readonly IRepository<Owner> _ownerRepository;
+        private readonly IRepository<Owner> _ownerRepository = ownerRepository
+            ?? throw new ArgumentNullException(nameof(ownerRepository));
 
-        public OwnerService(IRepository<Owner> ownerRepository)
-        {
-            _ownerRepository = ownerRepository;
-        }
-
-        /// <summary>
-        /// Obtiene un propietario por su Id.
-        /// </summary>
+        /// <inheritdoc />
         public async Task<Owner?> GetOwnerByIdAsync(int ownerId)
         {
             // Se asume que existe una especificación genérica para propietarios.
@@ -28,27 +22,21 @@ namespace AutoSalePlaygroundAPI.Application.Services
             return await _ownerRepository.FirstOrDefaultAsync(spec);
         }
 
-        /// <summary>
-        /// Obtiene todos los propietarios activos.
-        /// </summary>
+        /// <inheritdoc />
         public async Task<List<Owner>> GetAllActiveOwnersAsync()
         {
             var spec = new ActiveOwnerSpec(); // Esta especificación filtra por IsActive.
             return await _ownerRepository.ListAsync(spec);
         }
 
-        /// <summary>
-        /// Agrega un nuevo propietario.
-        /// </summary>
+        /// <inheritdoc />
         public async Task AddNewOwnerAsync(string firstName, string lastName)
         {
             var owner = new Owner(firstName, lastName);
             await _ownerRepository.AddAsync(owner);
         }
 
-        /// <summary>
-        /// Actualiza el nombre de un propietario.
-        /// </summary>
+        /// <inheritdoc />
         public async Task UpdateOwnerNameAsync(int ownerId, string newFirstName, string newLastName)
         {
             var owner = await GetOwnerByIdAsync(ownerId);

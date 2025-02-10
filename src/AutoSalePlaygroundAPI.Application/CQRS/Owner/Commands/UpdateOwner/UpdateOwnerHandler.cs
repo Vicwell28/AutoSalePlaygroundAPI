@@ -6,16 +6,14 @@ using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Owner.Commands.UpdateOwner
 {
-    public class UpdateOwnerHandler : IRequestHandler<UpdateOwnerCommand, ResponseDto<OwnerDto>>
+    public class UpdateOwnerHandler(IOwnerService ownerService, IMapper mapper) 
+        : IRequestHandler<UpdateOwnerCommand, ResponseDto<OwnerDto>>
     {
-        private readonly IOwnerService _ownerService;
-        private readonly IMapper _mapper;
-
-        public UpdateOwnerHandler(IOwnerService ownerService, IMapper mapper)
-        {
-            _ownerService = ownerService;
-            _mapper = mapper;
-        }
+        private readonly IOwnerService _ownerService = ownerService 
+            ?? throw new ArgumentNullException(nameof(ownerService));
+        
+        private readonly IMapper _mapper = mapper 
+            ?? throw new ArgumentNullException(nameof(ownerService));
 
         public async Task<ResponseDto<OwnerDto>> Handle(UpdateOwnerCommand request, CancellationToken cancellationToken)
         {

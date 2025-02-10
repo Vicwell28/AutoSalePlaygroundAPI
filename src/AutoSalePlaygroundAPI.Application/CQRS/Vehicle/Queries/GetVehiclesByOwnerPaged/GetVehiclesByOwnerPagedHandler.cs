@@ -1,23 +1,20 @@
 ﻿using AutoMapper;
+using AutoSalePlaygroundAPI.Application.Interfaces;
 using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.DTOs.Response;
-using AutoSalePlaygroundAPI.Application.Interfaces;
 using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetActiveVehiclesByOwnerPaged
 {
-    public class GetActiveVehiclesByOwnerPagedHandler : IRequestHandler<GetActiveVehiclesByOwnerPagedQuery, PaginatedResponseDto<VehicleDto>>
+    public class GetActiveVehiclesByOwnerPagedHandler(
+        IVehicleService vehicleService,
+        IMapper mapper) : IRequestHandler<GetActiveVehiclesByOwnerPagedQuery, PaginatedResponseDto<VehicleDto>>
     {
-        private readonly IVehicleService _vehicleService;
-        private readonly IMapper _mapper;
-
-        public GetActiveVehiclesByOwnerPagedHandler(
-            IVehicleService vehicleService,
-            IMapper mapper)
-        {
-            _vehicleService = vehicleService ?? throw new ArgumentNullException(nameof(vehicleService));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        }
+        private readonly IVehicleService _vehicleService = vehicleService 
+            ?? throw new ArgumentNullException(nameof(vehicleService));
+        
+        private readonly IMapper _mapper = mapper 
+            ?? throw new ArgumentNullException(nameof(mapper));
 
         public async Task<PaginatedResponseDto<VehicleDto>> Handle(GetActiveVehiclesByOwnerPagedQuery request, CancellationToken cancellationToken)
         {

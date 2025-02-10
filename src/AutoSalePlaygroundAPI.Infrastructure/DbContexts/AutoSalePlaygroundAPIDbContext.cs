@@ -5,13 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AutoSalePlaygroundAPI.Infrastructure.DbContexts
 {
-    public class AutoSalePlaygroundAPIDbContext : DbContext
+    public class AutoSalePlaygroundAPIDbContext(DbContextOptions<AutoSalePlaygroundAPIDbContext> options) : DbContext(options)
     {
-        public AutoSalePlaygroundAPIDbContext(DbContextOptions<AutoSalePlaygroundAPIDbContext> options)
-            : base(options)
-        {
-        }
-
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<Owner> Owners { get; set; }
         public DbSet<Accessory> Accessories { get; set; }
