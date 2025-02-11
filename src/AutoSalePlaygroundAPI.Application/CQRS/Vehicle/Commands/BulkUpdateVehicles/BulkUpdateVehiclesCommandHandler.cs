@@ -15,9 +15,9 @@ namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.BulkUpdateVehi
         {
             var producst = request.VehiclePartialUpdateDtos.Select(p => new Domain.Entities.Vehicle(
                  p.Id,
-                 p.LicensePlateNumber,
+                 p.LicensePlateNumber ?? string.Empty,
                  new Specifications(
-                     p.FuelType,
+                     p.FuelType ?? string.Empty,
                      p.EngineDisplacement ?? 0,
                      p.Horsepower ?? 0)
              ));

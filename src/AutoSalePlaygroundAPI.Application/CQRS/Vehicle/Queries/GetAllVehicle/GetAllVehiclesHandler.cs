@@ -3,7 +3,7 @@ using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.DTOs.Response;
 using AutoSalePlaygroundAPI.Infrastructure.Interfaces;
 using MediatR;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle
 {

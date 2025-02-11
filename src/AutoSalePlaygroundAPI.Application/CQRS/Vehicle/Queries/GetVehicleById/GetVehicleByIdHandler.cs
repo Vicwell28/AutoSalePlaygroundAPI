@@ -3,6 +3,7 @@ using AutoSalePlaygroundAPI.Domain.DTOs;
 using AutoSalePlaygroundAPI.Domain.DTOs.Response;
 using AutoSalePlaygroundAPI.Application.Interfaces;
 using MediatR;
+using AutoSalePlaygroundAPI.CrossCutting.Exceptions;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehicleById
 {
@@ -22,7 +23,7 @@ namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetVehicleById
 
             if (vehicle == null)
             {
-                throw new Exception("Vehículo no encontrado");
+                throw new NotFoundException("Vehículo no encontrado");
             }
 
             var vehicleDto = _mapper.Map<VehicleDto>(vehicle);

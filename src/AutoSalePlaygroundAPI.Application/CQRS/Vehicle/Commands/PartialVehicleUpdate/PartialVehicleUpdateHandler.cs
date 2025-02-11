@@ -5,10 +5,10 @@ using MediatR;
 
 namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.PartialVehicleUpdate
 {
-    public class PartialVehicleUpdateHandler(IVehicleService vehicleService) 
+    public class PartialVehicleUpdateHandler(IVehicleService vehicleService)
         : IRequestHandler<PartialVehicleUpdateCommand, ResponseDto<bool>>
     {
-        private readonly IVehicleService _vehicleService = vehicleService 
+        private readonly IVehicleService _vehicleService = vehicleService
             ?? throw new ArgumentNullException(nameof(vehicleService));
 
         public async Task<ResponseDto<bool>> Handle(PartialVehicleUpdateCommand request, CancellationToken cancellationToken)
@@ -16,7 +16,7 @@ namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Commands.PartialVehicle
             // Recupera el vehículo actual
             var vehicle = new Domain.Entities.Vehicle(
                  request.Id,
-                 request.UpdateDto.LicensePlateNumber,
+                 request.UpdateDto.LicensePlateNumber ?? string.Empty,
                  new Specifications(
                      request.UpdateDto.FuelType!,
                      request.UpdateDto.EngineDisplacement ?? 0,
