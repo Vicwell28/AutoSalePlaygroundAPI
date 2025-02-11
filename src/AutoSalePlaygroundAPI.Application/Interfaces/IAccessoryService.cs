@@ -5,7 +5,7 @@ namespace AutoSalePlaygroundAPI.Application.Interfaces
     /// <summary>
     /// Contrato del servicio de aplicación para gestionar operaciones relacionadas con accesorios.
     /// </summary>
-    public interface IAccessoryService
+    public interface IAccessoryService : IBaseService<Accessory>
     {
         /// <summary>
         /// Obtiene un accesorio por su Id.

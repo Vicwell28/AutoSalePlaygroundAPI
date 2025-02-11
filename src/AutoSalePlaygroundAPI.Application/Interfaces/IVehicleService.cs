@@ -10,7 +10,7 @@ namespace AutoSalePlaygroundAPI.Application.Interfaces
     /// Proporciona métodos para obtener, agregar, actualizar (completo, parcial o en bloque) y eliminar vehículos,
     /// así como para administrar operaciones relacionadas (por ejemplo, agregar accesorios).
     /// </summary>
-    public interface IVehicleService
+    public interface IVehicleService : IBaseService<Vehicle>
     {
         /// <summary>
         /// Obtiene la lista de vehículos activos asociados a un propietario.

@@ -17,6 +17,10 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Repositories
         public AutoSalePlaygroundAPIDbContext DbContext => _dbContext;
 
         #region Métodos CRUD
+        public async Task<IEnumerable<T>> ToListAsync()
+        {
+            return await _dbContext.Set<T>().ToListAsync();
+        }
 
         public async Task AddAsync(T entity)
         {

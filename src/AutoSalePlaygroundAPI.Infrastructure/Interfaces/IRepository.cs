@@ -1,8 +1,8 @@
 ﻿using AutoSalePlaygroundAPI.Domain.Entities;
 using AutoSalePlaygroundAPI.Domain.Interfaces;
 using AutoSalePlaygroundAPI.Infrastructure.DbContexts;
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Expressions;
 
 namespace AutoSalePlaygroundAPI.Infrastructure.Interfaces
 {
@@ -55,6 +55,12 @@ namespace AutoSalePlaygroundAPI.Infrastructure.Interfaces
         #endregion
 
         #region Métodos CRUD
+
+        /// <summary>
+        /// Obtiene todas las entidades
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<T>> ToListAsync();
 
         /// <summary>
         /// Agrega una nueva entidad de forma asíncrona.

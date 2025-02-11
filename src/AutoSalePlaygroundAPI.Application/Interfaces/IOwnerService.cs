@@ -5,7 +5,7 @@ namespace AutoSalePlaygroundAPI.Application.Interfaces
     /// <summary>
     /// Contrato del servicio de aplicación para gestionar operaciones relacionadas con propietarios.
     /// </summary>
-    public interface IOwnerService
+    public interface IOwnerService : IBaseService<Owner>
     {
         /// <summary>
         /// Obtiene un propietario por su Id.
