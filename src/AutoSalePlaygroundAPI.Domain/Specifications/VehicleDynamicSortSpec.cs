@@ -5,18 +5,28 @@ using AutoSalePlaygroundAPI.Domain.Specifications.Base;
 
 namespace AutoSalePlaygroundAPI.Domain.Specifications
 {
+    /// <summary>
+    /// Especificación para ordenar vehículos de forma dinámica utilizando múltiples criterios.
+    /// Permite definir un conjunto de criterios de ordenamiento, incluir relaciones y aplicar paginación.
+    /// </summary>
     public class VehicleDynamicSortSpec : Specification<Vehicle>
     {
+        /// <summary>
+        /// Inicializa la especificación con la lista de criterios de ordenamiento y los parámetros de paginación.
+        /// </summary>
+        /// <param name="sortCriteria">Lista de criterios de ordenamiento.</param>
+        /// <param name="pageNumber">El número de página (1-based).</param>
+        /// <param name="pageSize">La cantidad de registros por página.</param>
         public VehicleDynamicSortSpec(List<SortCriteriaDto> sortCriteria, int pageNumber, int pageSize)
         {
-            // Filtro base: por ejemplo, vehículos activos.
+            // Filtro base: por ejemplo, solo vehículos activos.
             SetCriteria(v => v.IsActive);
 
-            // Incluir relaciones que necesitemos (Owner, Accessories, etc.)
+            // Incluir relaciones necesarias.
             AddInclude(v => v.Owner);
             AddInclude(v => v.Accessories);
 
-            // Aplicar dinámicamente los criterios de ordenamiento
+            // Aplicar dinámicamente los criterios de ordenamiento.
             if (sortCriteria != null && sortCriteria.Any())
             {
                 foreach (var criteria in sortCriteria)
@@ -48,7 +58,7 @@ namespace AutoSalePlaygroundAPI.Domain.Specifications
                                 AddOrderByDescending(v => v.Specifications.Horsepower);
                             break;
                         default:
-                            // Ordenamiento por defecto: por Id
+                            // Ordenamiento por defecto: por Id.
                             if (criteria.SortDirection == OrderByEnum.Ascending)
                                 AddOrderBy(v => v.Id);
                             else
@@ -59,11 +69,11 @@ namespace AutoSalePlaygroundAPI.Domain.Specifications
             }
             else
             {
-                // Si no se proporcionan criterios, se aplica un ordenamiento por defecto
+                // Si no se proporcionan criterios, se aplica un ordenamiento por defecto.
                 AddOrderBy(v => v.Id);
             }
 
-            // Aplicar paginación: calcular el "skip" según la página y el tamaño
+            // Aplicar paginación: calcular el "skip" según la página y el tamaño.
             ApplyPaging((pageNumber - 1) * pageSize, pageSize);
         }
     }

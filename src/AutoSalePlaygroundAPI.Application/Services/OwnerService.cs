@@ -9,16 +9,31 @@ namespace AutoSalePlaygroundAPI.Application.Services
     /// <summary>
     /// Servicio de aplicación para gestionar operaciones relacionadas con propietarios.
     /// Extiende las operaciones genéricas definidas en <see cref="BaseService{Owner}"/>
-    /// y agrega métodos específicos para la entidad <see cref="Owner"/>.
+    /// e implementa métodos específicos para la entidad <see cref="Owner"/>.
     /// </summary>
     /// <remarks>
-    /// Inicializa una nueva instancia de <see cref="OwnerService"/>.
+    /// Se requiere inyectar un repositorio de escritura y uno de lectura para la entidad <see cref="Owner"/>.
+    /// Se lanzará una excepción <see cref="ArgumentNullException"/> si alguno de ellos es <c>null</c>.
     /// </remarks>
-    /// <param name="ownerRepository">Repositorio para la entidad <see cref="Owner"/>.</param>
-    /// <exception cref="ArgumentNullException">Se lanza si <paramref name="ownerRepository"/> es null.</exception>
-    public class OwnerService(IRepository<Owner> ownerRepository)
-        : BaseService<Owner>(ownerRepository), IOwnerService
+    public class OwnerService : BaseService<Owner>, IOwnerService
     {
+        /// <summary>
+        /// Inicializa una nueva instancia de <see cref="OwnerService"/>.
+        /// </summary>
+        /// <param name="ownerWriteRepository">
+        /// Repositorio de escritura para la entidad <see cref="Owner"/>.
+        /// </param>
+        /// <param name="ownerReadRepository">
+        /// Repositorio de lectura para la entidad <see cref="Owner"/>.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Se lanza si alguno de los repositorios es <c>null</c>.
+        /// </exception>
+        public OwnerService(IWriteRepository<Owner> ownerWriteRepository, IReadRepository<Owner> ownerReadRepository)
+            : base(ownerWriteRepository, ownerReadRepository)
+        {
+        }
+
         /// <inheritdoc />
         public async Task<Owner?> GetOwnerByIdAsync(int ownerId)
         {
@@ -43,7 +58,8 @@ namespace AutoSalePlaygroundAPI.Application.Services
         /// <inheritdoc />
         public async Task UpdateOwnerNameAsync(int ownerId, string newFirstName, string newLastName)
         {
-            var owner = await GetOwnerByIdAsync(ownerId);
+            var spec = new OwnerActiveSpec(ownerId);
+            var owner = await _writeRepository.FirstOrDefaultAsync(spec);
 
             if (owner == null)
             {

@@ -8,10 +8,20 @@ using System.Linq.Expressions;
 namespace AutoSalePlaygroundAPI.Domain.Specifications
 {
     /// <summary>
-    /// Especificación para obtener vehículos activos de un propietario con paginación.
+    /// Especificación para obtener vehículos activos de un propietario con paginación y ordenamiento.
+    /// Combina filtros (por propietario y por estado activo) y configura el Eager Loading.
     /// </summary>
     public class VehicleActiveByOwnerPagedSpec : Specification<Vehicle>
     {
+        /// <summary>
+        /// Inicializa la especificación para obtener vehículos activos de un propietario,
+        /// aplicando paginación y ordenamiento dinámico según los parámetros indicados.
+        /// </summary>
+        /// <param name="ownerId">El identificador del propietario.</param>
+        /// <param name="pageNumber">El número de página (1-based).</param>
+        /// <param name="pageSize">La cantidad de registros por página.</param>
+        /// <param name="vehicleSortByEnum">El campo por el cual se ordenará.</param>
+        /// <param name="orderByEnum">La dirección del ordenamiento (ascendente o descendente).</param>
         public VehicleActiveByOwnerPagedSpec(
             int ownerId,
             int pageNumber,
@@ -19,18 +29,19 @@ namespace AutoSalePlaygroundAPI.Domain.Specifications
             VehicleSortByEnum vehicleSortByEnum,
             OrderByEnum orderByEnum)
         {
-            // 1) Combinación de filtros con LinqKit
+            // 1) Combina el filtro por propietario y el filtro activo.
             var ownerFilter = new VehicleByOwnerFilter(ownerId);
             var activeFilter = new ActiveFilter<Vehicle>();
             var combined = ownerFilter.And(activeFilter);
-
             SetCriteria(combined.ToExpression());
 
+            // 2) Incluir relaciones para Eager Loading.
             AddInclude(vehiclesQuery => vehiclesQuery
                 .Include(v => v.Owner)
                 .Include(v => v.Accessories)
-                );
+            );
 
+            // 3) Aplicar ordenamiento dinámico.
             if (orderByEnum == OrderByEnum.Ascending)
             {
                 Expression<Func<Vehicle, object>> sortExpression = vehicleSortByEnum switch
@@ -42,7 +53,6 @@ namespace AutoSalePlaygroundAPI.Domain.Specifications
                     VehicleSortByEnum.Horsepower => v => v.Specifications.Horsepower,
                     _ => v => v.Id
                 };
-
                 AddOrderBy(sortExpression);
             }
             else
@@ -56,10 +66,10 @@ namespace AutoSalePlaygroundAPI.Domain.Specifications
                     VehicleSortByEnum.Horsepower => v => v.Specifications.Horsepower,
                     _ => v => v.Id
                 };
-
                 AddOrderByDescending(sortExpression);
             }
 
+            // 4) Aplicar paginación.
             ApplyPaging((pageNumber - 1) * pageSize, pageSize);
         }
     }

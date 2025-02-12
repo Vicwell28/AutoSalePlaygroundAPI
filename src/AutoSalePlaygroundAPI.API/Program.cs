@@ -8,7 +8,6 @@ using AutoSalePlaygroundAPI.Infrastructure;
 using AutoSalePlaygroundAPI.Infrastructure.DbContexts;
 using AutoSalePlaygroundAPI.Infrastructure.Interfaces;
 using AutoSalePlaygroundAPI.Infrastructure.Repositories;
-using AutoSalePlaygroundAPI.Infrastructure.Seeders;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -51,7 +50,8 @@ builder.Services.AddValidatorsFromAssembly(typeof(GetAllVehiclesQuery).Assembly)
 builder.Services.AddAutoMapper(typeof(VehicleProfile).Assembly);
 
 // Registro del repositorio genérico y Unit of Work:
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped(typeof(IWriteRepository<>), typeof(WriteRepository<>));
+builder.Services.AddScoped(typeof(IReadRepository<>), typeof(ReadRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Registro de los servicios de aplicación:

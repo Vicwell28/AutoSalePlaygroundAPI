@@ -9,6 +9,10 @@ namespace AutoSalePlaygroundAPI.Domain.Specifications
     /// </summary>
     public class GenericVehicleSpec : Specification<Vehicle>
     {
+        /// <summary>
+        /// Inicializa la especificación con el criterio proporcionado.
+        /// </summary>
+        /// <param name="criteria">La expresión lambda que define el filtrado.</param>
         public GenericVehicleSpec(Expression<Func<Vehicle, bool>> criteria)
         {
             SetCriteria(criteria);
