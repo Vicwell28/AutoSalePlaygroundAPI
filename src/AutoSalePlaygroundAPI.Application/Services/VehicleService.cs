@@ -11,51 +11,48 @@ namespace AutoSalePlaygroundAPI.Application.Services
 {
     /// <summary>
     /// Servicio de aplicación para gestionar operaciones relacionadas con vehículos.
-    /// Este servicio extiende las operaciones genéricas definidas en <see cref="BaseService{Vehicle}"/>
-    /// y agrega métodos específicos para la entidad <see cref="Vehicle"/>.
+    /// Extiende las operaciones genéricas definidas en <see cref="BaseService{Vehicle}"/>
+    /// e implementa métodos específicos para la entidad <see cref="Vehicle"/>.
     /// </summary>
     /// <remarks>
     /// Inicializa una nueva instancia de <see cref="VehicleService"/>.
     /// </remarks>
-    /// <param name="vehicleRepository">Repositorio para la entidad <see cref="Vehicle"/>.</param>
-    /// <param name="accessoryRepository">Repositorio para la entidad <see cref="Accessory"/>.</param>
-    /// <exception cref="ArgumentNullException">Se lanza si alguno de los repositorios es null.</exception>
-    public class VehicleService(
-        IWriteRepository<Vehicle> vehicleWriteRepository,
-        IReadRepository<Vehicle> vehicleReadRepository,
-        IWriteRepository<Accessory> accessoryReadRepository)
-        : BaseService<Vehicle>(vehicleWriteRepository, vehicleReadRepository), IVehicleService
+    /// <param name="vehicleRepository">Repositorio genérico para la entidad <see cref="Vehicle"/>.</param>
+    /// <param name="accessoryRepository">Repositorio genérico para la entidad <see cref="Accessory"/>.</param>
+    /// <exception cref="ArgumentNullException">Si alguno de los repositorios es <c>null</c>.</exception>
+    public class VehicleService(IRepository<Vehicle> vehicleRepository, IRepository<Accessory> accessoryRepository) : BaseService<Vehicle>(vehicleRepository), IVehicleService
     {
-        // Repositorio específico para la entidad Accessory, utilizado en operaciones particulares.
-        private readonly IWriteRepository<Accessory> _accessoryWriteRepository = accessoryReadRepository
-            ?? throw new ArgumentNullException(nameof(accessoryReadRepository));
+        /// <summary>
+        /// Repositorio genérico para la entidad <see cref="Accessory"/>, utilizado en operaciones particulares.
+        /// </summary>
+        private readonly IRepository<Accessory> _accessoryRepository = accessoryRepository ?? throw new ArgumentNullException(nameof(accessoryRepository));
 
         /// <inheritdoc />
         public async Task<List<Vehicle>> GetActiveVehiclesByOwnerAsync(int ownerId)
         {
             var spec = new VehicleActiveByOwnerSpec(ownerId);
-            return await base.ListAsync(spec);
+            return await ListAsync(spec);
         }
 
         /// <inheritdoc />
         public async Task<Vehicle?> GetVehicleByIdAsync(int vehicleId)
         {
             var spec = new GenericVehicleSpec(v => v.Id == vehicleId);
-            return await base.FirstOrDefaultAsync(spec);
+            return await FirstOrDefaultAsync(spec);
         }
 
         /// <inheritdoc />
         public async Task<List<int>> GetVehicleIdsActiveByOwnerAsync(int ownerId)
         {
             var spec = new VehicleActiveByOwnerSpec(ownerId);
-            return await _readRepository.ListAsync<int>(spec, v => v.Id);
+            return await _repository.ListAsync<int>(spec, v => v.Id);
         }
 
         /// <inheritdoc />
         public async Task<int?> GetVehicleIdActiveByOwnerAsync(int ownerId)
         {
             var spec = new VehicleActiveByOwnerSpec(ownerId);
-            return await _readRepository.FirstOrDefaultAsync(spec, v => v.Id);
+            return await _repository.FirstOrDefaultAsync(spec, v => v.Id);
         }
 
         /// <inheritdoc />
@@ -67,14 +64,14 @@ namespace AutoSalePlaygroundAPI.Application.Services
             OrderByEnum orderByEnum)
         {
             var spec = new VehicleActiveByOwnerPagedSpec(ownerId, pageNumber, pageSize, vehicleSortByEnum, orderByEnum);
-            return await _readRepository.ListPaginatedAsync(spec);
+            return await _repository.ListPaginatedAsync(spec);
         }
 
         /// <inheritdoc />
         public async Task<Vehicle> AddNewVehicleAsync(string licensePlateNumber, Owner owner, Specifications specifications)
         {
             var vehicle = new Vehicle(licensePlateNumber, owner, specifications);
-            await base.AddAsync(vehicle);
+            await AddAsync(vehicle);
             return vehicle;
         }
 
@@ -82,24 +79,22 @@ namespace AutoSalePlaygroundAPI.Application.Services
         public async Task UpdateVehicleLicensePlateAsync(int vehicleId, string newLicensePlate)
         {
             var spec = new GenericVehicleSpec(v => v.Id == vehicleId);
-            var vehicle = await _writeRepository.FirstOrDefaultAsync(spec);
+            var vehicle = await _repository.FirstOrDefaultAsync(spec);
 
             if (vehicle == null)
             {
                 throw new NotFoundException("Vehículo no encontrado.");
             }
 
-            // Se actualiza la placa utilizando la lógica de dominio.
             vehicle.UpdateLicensePlate(newLicensePlate);
-            await base.UpdateAsync(vehicle);
+            await UpdateAsync(vehicle);
         }
 
         /// <inheritdoc />
         public async Task ChangeVehicleOwnerAsync(int vehicleId, Owner newOwner)
         {
-            // Se obtiene el vehículo y se actualiza el propietario.
             var spec = new GenericVehicleSpec(v => v.Id == vehicleId);
-            var vehicle = await _writeRepository.FirstOrDefaultAsync(spec);
+            var vehicle = await _repository.FirstOrDefaultAsync(spec);
 
             if (vehicle == null)
             {
@@ -107,33 +102,29 @@ namespace AutoSalePlaygroundAPI.Application.Services
             }
 
             vehicle.ChangeOwner(newOwner);
-            await base.UpdateAsync(vehicle);
+            await UpdateAsync(vehicle);
         }
 
         /// <inheritdoc />
         public async Task AddVehicleAccessories(int vehicleId, List<int> accessories)
         {
-            // Se obtiene el vehículo al que se agregarán accesorios.
             var spec = new GenericVehicleSpec(v => v.Id == vehicleId);
-            var vehicle = await _writeRepository.FirstOrDefaultAsync(spec);
+            var vehicle = await _repository.FirstOrDefaultAsync(spec);
 
             if (vehicle == null)
             {
                 throw new NotFoundException("Vehículo no encontrado.");
             }
 
-            // Se crea una especificación para obtener los accesorios cuyos Ids se encuentran en la lista.
             var accessorySpec = new GenericAccessorySpec(x => accessories.Contains(x.Id));
-            var accessoryEntities = await _accessoryWriteRepository.ListAsync(accessorySpec);
+            var accessoryEntities = await _accessoryRepository.ListAsync(accessorySpec);
 
-            // Se agregan cada uno de los accesorios al vehículo.
             foreach (var accessory in accessoryEntities)
             {
                 vehicle.AddAccessory(accessory);
             }
 
-            // Se actualiza el vehículo utilizando el método genérico de la clase base.
-            await base.UpdateAsync(vehicle);
+            await UpdateAsync(vehicle);
         }
 
         /// <inheritdoc />
@@ -144,8 +135,7 @@ namespace AutoSalePlaygroundAPI.Application.Services
             int engineDisplacement,
             int horsepower)
         {
-            // Realiza una actualización en bloque directamente en la base de datos sin cargar la entidad.
-            await _writeRepository.ExecuteUpdateAsync(
+            await _repository.ExecuteUpdateAsync(
                 predicate: p => p.Id == vehicleId,
                 updateExpression: set => set
                     .SetProperty(p => p.LicensePlateNumber, newLicensePlate)
@@ -158,16 +148,14 @@ namespace AutoSalePlaygroundAPI.Application.Services
         /// <inheritdoc />
         public async Task DeleteVehicleByIdAsync(int vehicleId)
         {
-            await _writeRepository.ExecuteDeleteAsync(v => v.Id == vehicleId);
+            await _repository.ExecuteDeleteAsync(v => v.Id == vehicleId);
         }
 
         /// <inheritdoc />
         public Task PartialVehicleUpdateAsync(Vehicle vehicle)
         {
-            // Actualización parcial de una entidad Vehicle.
-            // Se adjunta la entidad al DbContext y se marcan las propiedades modificadas.
-            _writeRepository.DbContext.Attach(vehicle);
-            var vehicleEntry = _writeRepository.DbContext.Entry(vehicle);
+            _repository.DbContext.Attach(vehicle);
+            var vehicleEntry = _repository.DbContext.Entry(vehicle);
 
             if (!string.IsNullOrEmpty(vehicle.LicensePlateNumber))
             {
@@ -195,18 +183,16 @@ namespace AutoSalePlaygroundAPI.Application.Services
                 }
             }
 
-            // La persistencia se gestiona de forma centralizada en el pipeline.
             return Task.CompletedTask;
         }
 
         /// <inheritdoc />
         public Task PartialVehiclesBulkUpdateAsync(IEnumerable<Vehicle> vehicles)
         {
-            // Actualización parcial de un conjunto de vehículos.
             foreach (var vehicle in vehicles)
             {
-                _writeRepository.DbContext.Attach(vehicle);
-                var vehicleEntry = _writeRepository.DbContext.Entry(vehicle);
+                _repository.DbContext.Attach(vehicle);
+                var vehicleEntry = _repository.DbContext.Entry(vehicle);
 
                 if (!string.IsNullOrEmpty(vehicle.LicensePlateNumber))
                 {
@@ -235,15 +221,17 @@ namespace AutoSalePlaygroundAPI.Application.Services
                 }
             }
 
-            // La persistencia se gestiona de forma centralizada.
             return Task.CompletedTask;
         }
 
         /// <inheritdoc />
-        public async Task<(List<Vehicle> Vehicles, int TotalCount)> VehicleDynamicSort(List<SortCriteriaDto> sortCriteria, int pageNumber, int pageSize)
+        public async Task<(List<Vehicle> Vehicles, int TotalCount)> VehicleDynamicSort(
+            List<SortCriteriaDto> sortCriteria,
+            int pageNumber,
+            int pageSize)
         {
             var spec = new VehicleDynamicSortSpec(sortCriteria, pageNumber, pageSize);
-            return await _readRepository.ListPaginatedAsync(spec);
+            return await _repository.ListPaginatedAsync(spec);
         }
     }
 }

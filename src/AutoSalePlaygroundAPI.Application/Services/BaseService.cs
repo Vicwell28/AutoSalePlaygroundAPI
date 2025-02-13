@@ -2,7 +2,6 @@
 using AutoSalePlaygroundAPI.Domain.Entities;
 using AutoSalePlaygroundAPI.Domain.Interfaces;
 using AutoSalePlaygroundAPI.Infrastructure.Interfaces;
-using AutoSalePlaygroundAPI.Infrastructure.Repositories;
 using System.Linq.Expressions;
 
 namespace AutoSalePlaygroundAPI.Application.Services
@@ -15,102 +14,80 @@ namespace AutoSalePlaygroundAPI.Application.Services
     /// Tipo de entidad que implementa la interfaz <see cref="IEntity"/>.
     /// </typeparam>
     /// <remarks>
-    /// La clase requiere inyectar un repositorio de escritura (<see cref="IWriteRepository{T}"/>) y uno de lectura (<see cref="IReadRepository{T}"/>).
-    /// Se lanzará una excepción <see cref="ArgumentNullException"/> si alguno de ellos es <c>null</c>.
+    /// Inicializa una nueva instancia de la clase <see cref="BaseService{T}"/>.
     /// </remarks>
-    public abstract class BaseService<T>(IWriteRepository<T> writeRepository, IReadRepository<T> readRepository)
-        : IBaseService<T> where T : class, IEntity
+    /// <param name="repository">Repositorio genérico para la entidad.</param>
+    /// <exception cref="ArgumentNullException">Se lanza si el repositorio es <c>null</c>.</exception>
+    public abstract class BaseService<T>(IRepository<T> repository) : IBaseService<T> where T : class, IEntity
     {
-        /// <inheritdoc />
-        protected readonly IWriteRepository<T> _writeRepository = writeRepository
-            ?? throw new ArgumentNullException(nameof(writeRepository));
+        /// <summary>
+        /// Repositorio genérico utilizado para todas las operaciones de lectura y escritura.
+        /// </summary>
+        protected readonly IRepository<T> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
         /// <inheritdoc />
-        protected readonly IReadRepository<T> _readRepository = readRepository
-            ?? throw new ArgumentNullException(nameof(readRepository));
+        public async virtual Task<IEnumerable<T>> ToListAsync(bool trackChanges = false, CancellationToken cancellationToken = default) =>
+            await _repository.ToListAsync(trackChanges, cancellationToken);
 
         /// <inheritdoc />
-        public async virtual Task<IEnumerable<T>> ToListAsync()
-        {
-            // Obtiene todas las entidades utilizando el repositorio de lectura.
-            return await _readRepository.ToListAsync();
-        }
+        public async virtual Task AddAsync(T entity, CancellationToken cancellationToken = default) =>
+            await _repository.AddAsync(entity, cancellationToken);
 
         /// <inheritdoc />
-        public async virtual Task AddAsync(T entity)
-        {
-            // Agrega una nueva entidad utilizando el repositorio de escritura.
-            await _writeRepository.AddAsync(entity);
-        }
+        public async virtual Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default) =>
+            await _repository.AddRangeAsync(entities, cancellationToken);
 
         /// <inheritdoc />
-        public async virtual Task AddRangeAsync(IEnumerable<T> entities)
-        {
-            // Agrega un conjunto de entidades utilizando el repositorio de escritura.
-            await _writeRepository.AddRangeAsync(entities);
-        }
+        public async virtual Task UpdateAsync(T entity, CancellationToken cancellationToken = default) =>
+            await _repository.UpdateAsync(entity, cancellationToken);
 
         /// <inheritdoc />
-        public async virtual Task UpdateAsync(T entity)
-        {
-            // Actualiza la entidad utilizando el repositorio de escritura.
-            await _writeRepository.UpdateAsync(entity);
-        }
+        public async virtual Task UpdateRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default) =>
+            await _repository.UpdateRangeAsync(entities, cancellationToken);
 
         /// <inheritdoc />
-        public async virtual Task UpdateRangeAsync(IEnumerable<T> entities)
-        {
-            // Actualiza un conjunto de entidades utilizando el repositorio de escritura.
-            await _writeRepository.UpdateRangeAsync(entities);
-        }
+        public async virtual Task RemoveAsync(T entity, CancellationToken cancellationToken = default) =>
+            await _repository.RemoveAsync(entity, cancellationToken);
 
         /// <inheritdoc />
-        public async virtual Task RemoveAsync(T entity)
-        {
-            // Elimina la entidad utilizando el repositorio de escritura.
-            await _writeRepository.RemoveAsync(entity);
-        }
+        public async virtual Task RemoveRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default) =>
+            await _repository.RemoveRangeAsync(entities, cancellationToken);
 
         /// <inheritdoc />
-        public async virtual Task RemoveRangeAsync(IEnumerable<T> entities)
-        {
-            // Elimina un conjunto de entidades utilizando el repositorio de escritura.
-            await _writeRepository.RemoveRangeAsync(entities);
-        }
+        public async virtual Task<List<T>> ListAsync(
+            ISpecification<T> specification,
+            bool trackChanges = false,
+            CancellationToken cancellationToken = default) =>
+                await _repository.ListAsync(specification, trackChanges, cancellationToken);
 
         /// <inheritdoc />
-        public async virtual Task<List<T>> ListAsync(ISpecification<T> specification)
-        {
-            // Lista las entidades que cumplen con la especificación utilizando el repositorio de lectura.
-            return await _readRepository.ListAsync(specification);
-        }
+        public async virtual Task<T?> FirstOrDefaultAsync(
+            ISpecification<T> specification,
+            bool trackChanges = false,
+            CancellationToken cancellationToken = default) =>
+                await _repository.FirstOrDefaultAsync(specification, trackChanges, cancellationToken);
 
         /// <inheritdoc />
-        public async virtual Task<T?> FirstOrDefaultAsync(ISpecification<T> specification)
-        {
-            // Obtiene la primera entidad que cumple la especificación utilizando el repositorio de lectura.
-            return await _readRepository.FirstOrDefaultAsync(specification);
-        }
+        public async virtual Task<List<TResult>> ListAsync<TResult>(
+            ISpecification<T> specification,
+            Expression<Func<T, TResult>> selector,
+            bool trackChanges = false,
+            CancellationToken cancellationToken = default) =>
+                await _repository.ListAsync(specification, selector, trackChanges, cancellationToken);
 
         /// <inheritdoc />
-        public async virtual Task<List<TResult>> ListAsync<TResult>(ISpecification<T> specification, Expression<Func<T, TResult>> selector)
-        {
-            // Lista y proyecta las entidades que cumplen con la especificación según el selector utilizando el repositorio de lectura.
-            return await _readRepository.ListAsync(specification, selector);
-        }
+        public async virtual Task<TResult?> FirstOrDefaultAsync<TResult>(
+            ISpecification<T> specification,
+            Expression<Func<T, TResult>> selector,
+            bool trackChanges = false,
+            CancellationToken cancellationToken = default) =>
+                await _repository.FirstOrDefaultAsync(specification, selector, trackChanges, cancellationToken);
 
         /// <inheritdoc />
-        public async virtual Task<TResult?> FirstOrDefaultAsync<TResult>(ISpecification<T> specification, Expression<Func<T, TResult>> selector)
-        {
-            // Obtiene el primer resultado proyectado según la especificación utilizando el repositorio de lectura.
-            return await _readRepository.FirstOrDefaultAsync(specification, selector);
-        }
-
-        /// <inheritdoc />
-        public async virtual Task<(List<T> Data, int TotalCount)> ListPaginatedAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
-        {
-            // Retorna una lista paginada de entidades y el total de registros utilizando el repositorio de lectura.
-            return await _readRepository.ListPaginatedAsync(specification, cancellationToken);
-        }
+        public async virtual Task<(List<T> Data, int TotalCount)> ListPaginatedAsync(
+            ISpecification<T> specification,
+            bool trackChanges = false,
+            CancellationToken cancellationToken = default) =>
+                await _repository.ListPaginatedAsync(specification, trackChanges, cancellationToken);
     }
 }

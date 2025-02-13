@@ -5,126 +5,133 @@ using System.Linq.Expressions;
 namespace AutoSalePlaygroundAPI.Application.Interfaces
 {
     /// <summary>
-    /// Interfaz base para servicios que operan sobre entidades del dominio.
-    /// Proporciona métodos CRUD y consultas basadas en especificaciones.
+    /// Contrato base para servicios de aplicación que operan sobre entidades del dominio.
+    /// Define métodos comunes para operaciones CRUD y consultas basadas en especificaciones,
+    /// permitiendo configurar el tracking de entidades y la cancelación de operaciones asíncronas.
     /// </summary>
-    /// <typeparam name="T">
-    /// Tipo de entidad que implementa la interfaz <see cref="IEntity"/>.
-    /// </typeparam>
+    /// <typeparam name="T">El tipo de entidad que implementa la interfaz <see cref="IEntity"/>.</typeparam>
     public interface IBaseService<T> where T : class, IEntity
     {
         /// <summary>
-        /// Obtiene una lista completa de todas las entidades.
+        /// Obtiene todas las entidades de forma asíncrona.
         /// </summary>
-        /// <returns>
-        /// Una colección de entidades de tipo <typeparamref name="T"/>.
-        /// </returns>
-        Task<IEnumerable<T>> ToListAsync();
+        /// <param name="trackChanges">Indica si se debe habilitar el tracking de las entidades.</param>
+        /// <param name="cancellationToken">Token para cancelar la operación.</param>
+        /// <returns>Una colección de entidades.</returns>
+        Task<IEnumerable<T>> ToListAsync(bool trackChanges = false, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Agrega una nueva entidad.
+        /// Agrega una nueva entidad de forma asíncrona.
         /// </summary>
         /// <param name="entity">La entidad a agregar.</param>
-        Task AddAsync(T entity);
+        /// <param name="cancellationToken">Token para cancelar la operación.</param>
+        Task AddAsync(T entity, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Agrega un rango de entidades.
+        /// Agrega un rango de entidades de forma asíncrona.
         /// </summary>
-        /// <param name="entities">Colección de entidades a agregar.</param>
-        Task AddRangeAsync(IEnumerable<T> entities);
+        /// <param name="entities">La colección de entidades a agregar.</param>
+        /// <param name="cancellationToken">Token para cancelar la operación.</param>
+        Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Actualiza una entidad existente.
+        /// Actualiza una entidad existente de forma asíncrona.
         /// </summary>
         /// <param name="entity">La entidad a actualizar.</param>
-        Task UpdateAsync(T entity);
+        /// <param name="cancellationToken">Token para cancelar la operación.</param>
+        Task UpdateAsync(T entity, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Actualiza un rango de entidades.
+        /// Actualiza un rango de entidades existentes de forma asíncrona.
         /// </summary>
-        /// <param name="entities">Colección de entidades a actualizar.</param>
-        Task UpdateRangeAsync(IEnumerable<T> entities);
+        /// <param name="entities">La colección de entidades a actualizar.</param>
+        /// <param name="cancellationToken">Token para cancelar la operación.</param>
+        Task UpdateRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Elimina una entidad.
+        /// Elimina una entidad de forma asíncrona.
         /// </summary>
         /// <param name="entity">La entidad a eliminar.</param>
-        Task RemoveAsync(T entity);
+        /// <param name="cancellationToken">Token para cancelar la operación.</param>
+        Task RemoveAsync(T entity, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Elimina un rango de entidades.
+        /// Elimina un rango de entidades de forma asíncrona.
         /// </summary>
-        /// <param name="entities">Colección de entidades a eliminar.</param>
-        Task RemoveRangeAsync(IEnumerable<T> entities);
+        /// <param name="entities">La colección de entidades a eliminar.</param>
+        /// <param name="cancellationToken">Token para cancelar la operación.</param>
+        Task RemoveRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Lista las entidades que cumplen con una especificación dada.
+        /// Obtiene una lista de entidades que cumplen con la especificación dada.
         /// </summary>
-        /// <param name="specification">
-        /// La especificación que define el filtro.
-        /// </param>
+        /// <param name="specification">La especificación que define los criterios de consulta.</param>
+        /// <param name="trackChanges">Indica si se debe habilitar el tracking de las entidades.</param>
+        /// <param name="cancellationToken">Token para cancelar la operación.</param>
+        /// <returns>Una lista de entidades que cumplen la especificación.</returns>
+        Task<List<T>> ListAsync(
+            ISpecification<T> specification,
+            bool trackChanges = false,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Obtiene la primera entidad que cumple con la especificación dada o <c>null</c> si no se encuentra.
+        /// </summary>
+        /// <param name="specification">La especificación que define los criterios de consulta.</param>
+        /// <param name="trackChanges">Indica si se debe habilitar el tracking de la entidad.</param>
+        /// <param name="cancellationToken">Token para cancelar la operación.</param>
+        /// <returns>La primera entidad que cumple con la especificación o <c>null</c>.</returns>
+        Task<T?> FirstOrDefaultAsync(
+            ISpecification<T> specification,
+            bool trackChanges = false,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Obtiene una lista de resultados proyectados según la especificación y el selector.
+        /// </summary>
+        /// <typeparam name="TResult">El tipo del resultado proyectado.</typeparam>
+        /// <param name="specification">La especificación que define los criterios de consulta.</param>
+        /// <param name="selector">La expresión que define la proyección de la entidad.</param>
+        /// <param name="trackChanges">Indica si se debe habilitar el tracking de las entidades.</param>
+        /// <param name="cancellationToken">Token para cancelar la operación.</param>
+        /// <returns>Una lista de resultados proyectados.</returns>
+        Task<List<TResult>> ListAsync<TResult>(
+            ISpecification<T> specification,
+            Expression<Func<T, TResult>> selector,
+            bool trackChanges = false,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Obtiene el primer resultado proyectado según la especificación y el selector, o <c>null</c> si no se encuentra.
+        /// </summary>
+        /// <typeparam name="TResult">El tipo del resultado proyectado.</typeparam>
+        /// <param name="specification">La especificación que define los criterios de consulta.</param>
+        /// <param name="selector">La expresión que define la proyección de la entidad.</param>
+        /// <param name="trackChanges">Indica si se debe habilitar el tracking de la entidad.</param>
+        /// <param name="cancellationToken">Token para cancelar la operación.</param>
+        /// <returns>El primer resultado proyectado o <c>null</c>.</returns>
+        Task<TResult?> FirstOrDefaultAsync<TResult>(
+            ISpecification<T> specification,
+            Expression<Func<T, TResult>> selector,
+            bool trackChanges = false,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Obtiene una lista paginada de entidades y el total de registros que cumplen con la especificación.
+        /// </summary>
+        /// <param name="specification">La especificación que define los criterios de consulta y paginación.</param>
+        /// <param name="trackChanges">Indica si se debe habilitar el tracking de las entidades.</param>
+        /// <param name="cancellationToken">Token para cancelar la operación.</param>
         /// <returns>
-        /// Lista de entidades que cumplen la especificación.
+        /// Una tupla que contiene:
+        /// <list type="bullet">
+        ///   <item><c>Data</c>: la lista de entidades que cumplen con la especificación.</item>
+        ///   <item><c>TotalCount</c>: el total de registros sin aplicar paginación.</item>
+        /// </list>
         /// </returns>
-        Task<List<T>> ListAsync(ISpecification<T> specification);
-
-        /// <summary>
-        /// Obtiene la primera entidad que cumple con una especificación.
-        /// </summary>
-        /// <param name="specification">
-        /// La especificación a evaluar.
-        /// </param>
-        /// <returns>
-        /// La primera entidad que cumple la especificación o <c>null</c> si no se encuentra.
-        /// </returns>
-        Task<T?> FirstOrDefaultAsync(ISpecification<T> specification);
-
-        /// <summary>
-        /// Lista las entidades que cumplen con una especificación y las proyecta a un tipo específico.
-        /// </summary>
-        /// <typeparam name="TResult">
-        /// Tipo de resultado de la proyección.
-        /// </typeparam>
-        /// <param name="specification">
-        /// La especificación que define el filtro.
-        /// </param>
-        /// <param name="selector">
-        /// Expresión que define la proyección.
-        /// </param>
-        /// <returns>
-        /// Lista de resultados proyectados.
-        /// </returns>
-        Task<List<TResult>> ListAsync<TResult>(ISpecification<T> specification, Expression<Func<T, TResult>> selector);
-
-        /// <summary>
-        /// Obtiene la primera entidad que cumple con una especificación, proyectada a un tipo específico.
-        /// </summary>
-        /// <typeparam name="TResult">
-        /// Tipo de resultado de la proyección.
-        /// </typeparam>
-        /// <param name="specification">
-        /// La especificación a evaluar.
-        /// </param>
-        /// <param name="selector">
-        /// Expresión que define la proyección.
-        /// </param>
-        /// <returns>
-        /// El primer resultado proyectado o <c>null</c> si no se encuentra.
-        /// </returns>
-        Task<TResult?> FirstOrDefaultAsync<TResult>(ISpecification<T> specification, Expression<Func<T, TResult>> selector);
-
-        /// <summary>
-        /// Lista las entidades de forma paginada basadas en una especificación.
-        /// </summary>
-        /// <param name="specification">
-        /// La especificación que define el filtro y la paginación.
-        /// </param>
-        /// <param name="cancellationToken">
-        /// Token para cancelar la operación, si es necesario.
-        /// </param>
-        /// <returns>
-        /// Una tupla que contiene la lista de entidades que cumplen la especificación y el total de registros.
-        /// </returns>
-        Task<(List<T> Data, int TotalCount)> ListPaginatedAsync(ISpecification<T> specification, CancellationToken cancellationToken = default);
+        Task<(List<T> Data, int TotalCount)> ListPaginatedAsync(
+            ISpecification<T> specification,
+            bool trackChanges = false,
+            CancellationToken cancellationToken = default);
     }
 }

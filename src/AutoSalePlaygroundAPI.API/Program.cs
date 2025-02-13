@@ -50,8 +50,7 @@ builder.Services.AddValidatorsFromAssembly(typeof(GetAllVehiclesQuery).Assembly)
 builder.Services.AddAutoMapper(typeof(VehicleProfile).Assembly);
 
 // Registro del repositorio genérico y Unit of Work:
-builder.Services.AddScoped(typeof(IWriteRepository<>), typeof(WriteRepository<>));
-builder.Services.AddScoped(typeof(IReadRepository<>), typeof(ReadRepository<>));
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Registro de los servicios de aplicación:
