@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1C5A1E4A-3204-421E-BD41-BCEEE30141C1}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoSalePlaygroundAPI.Infrastructure", "src\AutoSalePlaygroundAPI.Infrastructure\AutoSalePlaygroundAPI.Infrastructure.csproj", "{53DCA56A-A7FE-4757-9FFA-681A9D578F67}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoSalePlaygroundAPI.CrossCutting", "src\AutoSalePlaygroundAPI.CrossCutting\AutoSalePlaygroundAPI.CrossCutting.csproj", "{FA2E375D-E8DB-4CE6-B07B-5904BD358441}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoSalePlaygroundAPI.UnitTests", "tests\AutoSalePlaygroundAPI.UnitTests\AutoSalePlaygroundAPI.UnitTests.csproj", "{127F004A-B8A4-4B25-AF40-F62854CBD0D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +45,10 @@ Global
 		{FA2E375D-E8DB-4CE6-B07B-5904BD358441}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA2E375D-E8DB-4CE6-B07B-5904BD358441}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA2E375D-E8DB-4CE6-B07B-5904BD358441}.Release|Any CPU.Build.0 = Release|Any CPU
+		{127F004A-B8A4-4B25-AF40-F62854CBD0D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{127F004A-B8A4-4B25-AF40-F62854CBD0D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{127F004A-B8A4-4B25-AF40-F62854CBD0D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{127F004A-B8A4-4B25-AF40-F62854CBD0D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,5 +59,6 @@ Global
 		{7AAA92D8-D21D-476B-818A-214388768391} = {1C5A1E4A-3204-421E-BD41-BCEEE30141C1}
 		{53DCA56A-A7FE-4757-9FFA-681A9D578F67} = {1C5A1E4A-3204-421E-BD41-BCEEE30141C1}
 		{FA2E375D-E8DB-4CE6-B07B-5904BD358441} = {1C5A1E4A-3204-421E-BD41-BCEEE30141C1}
+		{127F004A-B8A4-4B25-AF40-F62854CBD0D6} = {BD9980F3-80C9-479B-AC23-CA166BE66179}
 	EndGlobalSection
 EndGlobal
