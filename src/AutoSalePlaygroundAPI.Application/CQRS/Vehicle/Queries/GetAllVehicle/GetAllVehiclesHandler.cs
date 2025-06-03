@@ -26,7 +26,7 @@ namespace AutoSalePlaygroundAPI.Application.CQRS.Vehicle.Queries.GetAllVehicle
 
             var vehicleDtos = _mapper.Map<List<VehicleDto>>(vehicles);
 
-            return ResponseDto<List<VehicleDto>>.Success(vehicleDtos, "Vehículos obtenidos con éxito"); ;
+            return ResponseDto<List<VehicleDto>>.Success(vehicleDtos, "Vehículos obtenidos con éxito");
         }
     }
 }
